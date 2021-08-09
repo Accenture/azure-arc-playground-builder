@@ -16,4 +16,4 @@ The set of scripts & templates in this repo do the following:
 - [Arc App Service on local Docker Desktop](deploying-arc-appservice-ddk8s.md)
 
 ## Next Steps
-Checkout Microsoft's [Azure Arc Jumpstart - ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/). ArcBox is larger-scale Arc sandbox, enabling you to evaluate Azure Arc scenarios on a more "on-prem" production-like Kubernetes environment.
+Check out Microsoft's [Azure Arc Jumpstart - ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/). ArcBox is larger-scale Arc sandbox, enabling you to evaluate Azure Arc scenarios on a more "on-prem" production-like Kubernetes environment.
