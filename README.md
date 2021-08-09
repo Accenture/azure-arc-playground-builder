@@ -1,5 +1,5 @@
 # Azure Arc App & Data Services Quickstart
-This repo contains infrastructure-as-code automation scripts & templates to deploy an Azure Arc quickstart Hello World app. This quickstart highlights recently announced Azure Arc App Service & Data capabilities. The intention of this repo is to accelerate local App Service & Data on Arc enabled Kubernetes prototyping.
+This repo contains infrastructure-as-code automation scripts & templates to deploy an Azure Arc quickstart Hello World app. This quickstart highlights [recently announced](https://azure.microsoft.com/en-us/updates/public-preview-run-app-service-on-kubernetes-or-anywhere-with-azure-arc/) Azure Arc App Service & Data capabilities. The intention of this repo is to accelerate local App Service & Data on Arc enabled Kubernetes prototyping.
 
 The set of scripts & templates in this repo do the following:
 1. Create an Azure Arc connected Kubernetes cluster, either AKS or Docker Desktop single node clusters
