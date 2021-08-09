@@ -6,8 +6,8 @@
 
 ## Demo deployment scripts
 
-- [Arc App Service on Docker Desktop]([deploy-arc-ddk8s.azcli](scripts/deploy-arc-ddk8s.azcli))
-- [Arc App Service + Arc SQL Managed Instance or PostgreSQL Hyperscale on AKS]([deploy-arc-aks.azcli](scripts/deploy-arc-aks.azcli))
+- [Arc App Service on Docker Desktop](scripts/deploy-arc-ddk8s.azcli)
+- [Arc App Service + Arc SQL Managed Instance or PostgreSQL Hyperscale on AKS](scripts/deploy-arc-aks.azcli)
 
 ## Key Takeaways
 
@@ -24,9 +24,6 @@
   - Deploy the solution on Azure multitenant (Azure App Service + Azure SQL Database)
   - Deploy the solution on Azure Kubernetes Service (LIMA with SQL Containers)
   - Deploy the solution on on-premises Kubernetes (tbd - Kind? Minikube? Commercial k8s in a VM?)
-  - Options
-    - SQL Server has built-in replication options - do we set up the multitenant as a master and others as replicas that can push to master? This would be awesome to have the multitenant be the master but showing downstream locations being kept in sync.
-- The demo portion on the [Digital Showcase](https://showcase.avanade.com) should be a recorded demo and PowerPoint deck, due to the complexities of deploying/running Kubernetes on premises (your laptop) and Azure.
 
 ## Relevant Software and Documentation Links
 
