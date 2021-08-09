@@ -1,0 +1,180 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "dataControllerId": {
+            "type": "String"
+        },
+        "customLocation": {
+            "type": "String"
+        },
+        "location": {
+            "type": "String"
+        },
+        "admin": {
+            "type": "String"
+        },
+        "password": {
+            "type": "SecureString"
+        },
+        "namespace": {
+            "type": "String"
+        },
+        "serviceType": {
+            "type": "String"
+        },
+        "vCoresRequest": {
+            "type": "Int"
+        },
+        "memoryRequest": {
+            "type": "String"
+        },
+        "vCoresLimit": {
+            "type": "Int"
+        },
+        "memoryLimit": {
+            "type": "String"
+        },
+        "dataStorageSize": {
+            "type": "String"
+        },
+        "dataStorageClassName": {
+            "type": "String"
+        },
+        "logsStorageSize": {
+            "type": "String"
+        },
+        "logsStorageClassName": {
+            "type": "String"
+        },
+        "dataLogsStorageSize": {
+            "type": "String"
+        },
+        "dataLogsStorageClassName": {
+            "type": "String"
+        },
+        "backupsStorageSize": {
+            "type": "String"
+        },
+        "backupsStorageClassName": {
+            "type": "String"
+        },
+        "replicas": {
+            "type": "Int"
+        },
+        "resourceTags": {
+            "type": "Object"
+        },
+        "subscription": {
+            "type": "String"
+        },
+        "resourceGroup": {
+            "type": "String"
+        },
+        "resourceName": {
+            "type": "String"
+        },
+        "apiVersion": {
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.AzureArcData/sqlManagedInstances",
+            "apiVersion": "[parameters('apiVersion')]",
+            "name": "[parameters('resourceName')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocation')]"
+            },
+            "tags": "[parameters('resourceTags')]",
+            "sku": {
+                "name": "vCore",
+                "tier": "GeneralPurpose"
+            },
+            "properties": {
+                "admin": "[parameters('admin')]",
+                "basicLoginInformation": {
+                    "username": "[parameters('admin')]",
+                    "password": "[parameters('password')]"
+                },
+                "licenseType": "LicenseIncluded",
+                "k8sRaw": {
+                    "spec": {
+                        "dev": false,
+                        "services": {
+                            "primary": {
+                                "type": "[parameters('serviceType')]"
+                            }
+                        },
+                        "replicas": "[parameters('replicas')]",
+                        "scheduling": {
+                            "default": {
+                                "resources": {
+                                    "requests": {
+                                        "vcores": "[parameters('vCoresRequest')]",
+                                        "memory": "[parameters('memoryRequest')]"
+                                    },
+                                    "limits": {
+                                        "vcores": "[parameters('vCoresLimit')]",
+                                        "memory": "[parameters('memoryLimit')]"
+                                    }
+                                }
+                            }
+                        },
+                        "storage": {
+                            "data": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('dataStorageClassName')]",
+                                        "size": "[parameters('dataStorageSize')]"
+                                    }
+                                ]
+                            },
+                            "logs": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('logsStorageClassName')]",
+                                        "size": "[parameters('logsStorageSize')]"
+                                    }
+                                ]
+                            },
+                            "datalogs": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('dataLogsStorageClassName')]",
+                                        "size": "[parameters('dataLogsStorageSize')]"
+                                    }
+                                ]
+                            },
+                            "backups": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('backupsStorageClassName')]",
+                                        "size": "[parameters('backupsStorageSize')]"
+                                    }
+                                ]
+                            }
+                        },
+                        "settings": {
+                            "azure": {
+                                "subscription": "[parameters('subscription')]",
+                                "resourceGroup": "[parameters('resourceGroup')]",
+                                "location": "[parameters('location')]"
+                            }
+                        }
+                    },
+                    "metadata": {
+                        "namespace": "[parameters('namespace')]"
+                    },
+                    "status": {}
+                },
+                "dataControllerId": "[parameters('dataControllerId')]"
+            }
+        }
+    ],
+    "outputs": {}
+}

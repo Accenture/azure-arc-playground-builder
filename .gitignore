@@ -1,0 +1,11 @@
+# hello world files
+src/HelloWorld/obj
+src/HelloWorld/bin
+
+# VSCode assets
+.vscode
+
+# Vistual Studio Assets
+src/HelloWorld/.config
+src/HelloWorld/.vs
+src/HelloWorld/HelloWorld.csproj.user

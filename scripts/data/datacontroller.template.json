@@ -1,0 +1,204 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "namespace": {
+            "type": "String"
+        },
+        "connectionMode": {
+            "type": "String"
+        },
+        "controllerName": {
+            "type": "String"
+        },
+        "administratorLogin": {
+            "type": "String"
+        },
+        "administratorPassword": {
+            "type": "SecureString"
+        },
+        "customLocation": {
+            "type": "String"
+        },
+        "uspClientId": {
+            "type": "String"
+        },
+        "uspTenantId": {
+            "type": "String"
+        },
+        "uspClientSecret": {
+            "type": "SecureString"
+        },
+        "uspAuthority": {
+            "type": "String"
+        },
+        "logAnalyticsWorkspaceId": {
+            "type": "String"
+        },
+        "logAnalyticsPrimaryKey": {
+            "type": "String"
+        },
+        "resourceTags": {
+            "type": "Object",
+            "defaultValue": {}
+        },
+        "infrastructure": {
+            "type": "String"
+        },
+        "dockerRegistryCredential": {
+            "type": "String"
+        },
+        "dockerImagePullPolicy": {
+            "type": "String"
+        },
+        "dockerImageTag": {
+            "type": "String"
+        },
+        "dockerRegistry": {
+            "type": "String"
+        },
+        "dockerRepository": {
+            "type": "String"
+        },
+        "dataStorageClass": {
+            "type": "String"
+        },
+        "dataStorageSize": {
+            "type": "String"
+        },
+        "logsStorageClass": {
+            "type": "String"
+        },
+        "logsStorageSize": {
+            "type": "String"
+        },
+        "serviceType": {
+            "type": "String"
+        },
+        "controllerPort": {
+            "type": "Int"
+        },
+        "serviceProxyPort": {
+            "type": "Int"
+        },
+        "subscription": {
+            "type": "String"
+        },
+        "resourceGroup": {
+            "type": "String"
+        },
+        "location": {
+            "type": "String"
+        },
+        "resourceName": {
+            "type": "String"
+        },
+        "apiVersion": {
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.AzureArcData/dataControllers",
+            "apiVersion": "[parameters('apiVersion')]",
+            "name": "[parameters('resourceName')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "name": "[parameters('customLocation')]",
+                "type": "CustomLocation"
+            },
+            "tags": "[parameters('resourceTags')]",
+            "properties": {
+                "basicLoginInformation": {
+                    "username": "[parameters('administratorLogin')]",
+                    "password": "[parameters('administratorPassword')]"
+                },
+                "uploadServicePrincipal": {
+                    "clientId": "[parameters('uspClientId')]",
+                    "tenantId": "[parameters('uspTenantId')]",
+                    "authority": "[parameters('uspAuthority')]",
+                    "clientSecret": "[parameters('uspClientSecret')]"
+                },
+                "logAnalyticsWorkspaceConfig": {
+                    "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",
+                    "primaryKey": "[parameters('logAnalyticsPrimaryKey')]"
+                },
+                "infrastructure": "[parameters('infrastructure')]",
+                "k8sRaw": {
+                    "kind": "datacontroller",
+                    "spec": {
+                        "credentials": {
+                            "controllerAdmin": "controller-login-secret",
+                            "dockerRegistry": "[parameters('dockerRegistryCredential')]",
+                            "domainServiceAccount": "domain-service-account-secret",
+                            "serviceAccount": "sa-mssql-controller"
+                        },
+                        "security": {
+                            "allowDumps": true,
+                            "allowNodeMetricsCollection": true,
+                            "allowPodMetricsCollection": true,
+                            "allowRunAsRoot": false
+                        },
+                        "services": [
+                            {
+                                "name": "controller",
+                                "port": "[parameters('controllerPort')]",
+                                "serviceType": "[parameters('serviceType')]"
+                            },
+                            {
+                                "name": "serviceProxy",
+                                "port": "[parameters('serviceProxyPort')]",
+                                "serviceType": "[parameters('serviceType')]"
+                            }
+                        ],
+                        "settings": {
+                            "ElasticSearch": {
+                                "vm.max_map_count": "-1"
+                            },
+                            "azure": {
+                                "connectionMode": "[parameters('connectionMode')]",
+                                "location": "[parameters('location')]",
+                                "resourceGroup": "[parameters('resourceGroup')]",
+                                "subscription": "[parameters('subscription')]"
+                            },
+                            "controller": {
+                                "displayName": "[parameters('controllerName')]",
+                                "enableBilling": "True",
+                                "logs.rotation.days": "7",
+                                "logs.rotation.size": "5000"
+                            }
+                        },
+                        "storage": {
+                            "data": {
+                                "accessMode": "ReadWriteOnce",
+                                "className": "[parameters('dataStorageClass')]",
+                                "size": "[parameters('dataStorageSize')]"
+                            },
+                            "logs": {
+                                "accessMode": "ReadWriteOnce",
+                                "className": "[parameters('logsStorageClass')]",
+                                "size": "[parameters('logsStorageSize')]"
+                            }
+                        },
+                        "infrastructure": "[parameters('infrastructure')]",
+                        "docker": {
+                            "registry": "[parameters('dockerRegistry')]",
+                            "repository": "[parameters('dockerRepository')]",
+                            "imageTag": "[parameters('dockerImageTag')]",
+                            "imagePullPolicy": "[parameters('dockerImagePullPolicy')]"
+                        }
+                    },
+                    "metadata": {
+                        "namespace": "[parameters('namespace')]",
+                        "name": "datacontroller"
+                    },
+                    "apiVersion": "arcdata.microsoft.com/v1beta1",
+                    "status": {}
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

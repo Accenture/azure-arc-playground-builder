@@ -1,0 +1,16 @@
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+    
+}
+
+<div class="text-left">
+    <h2>@Model.HeaderMessage</h2>
+    <ul>
+        <li>Instance: @Model.MachineName</li>
+        <li>OS: @Model.OSVersion</li>
+        <li>Processor Count: @Model.ProcessorCount</li>
+        <li>Server IP: @Model.HostIp</li>
+        <li>Host Name: @Model.HostName</li>
+    </ul>
+</div>

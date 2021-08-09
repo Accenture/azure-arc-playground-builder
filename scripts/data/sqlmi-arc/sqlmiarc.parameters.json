@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serviceType": {
+            "value": "LoadBalancer"
+        },
+        "vCoresRequest": {
+            "value": 2
+        },
+        "memoryRequest": {
+            "value": "4Gi"
+        },
+        "vCoresLimit": {
+            "value": 4
+        },
+        "memoryLimit": {
+            "value": "8Gi"
+        },
+        "dataStorageSize": {
+            "value": "5Gi"
+        },
+        "dataStorageClassName": {
+            "value": ""
+        },
+        "logsStorageSize": {
+            "value": "5Gi"
+        },
+        "logsStorageClassName": {
+            "value": ""
+        },
+        "dataLogsStorageSize": {
+            "value": "5Gi"
+        },
+        "dataLogsStorageClassName": {
+            "value": ""
+        },
+        "backupsStorageSize": {
+            "value": "5Gi"
+        },
+        "backupsStorageClassName": {
+            "value": ""
+        },
+        "replicas": {
+            "value": 1
+        },
+        "resourceTags": {
+            "value": {}
+        },
+        "apiVersion": {
+            "value": "2021-07-01-preview"
+        }
+    }
+}

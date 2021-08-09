@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "coordinatorVcores": {
+            "value": 2
+        },
+        "coordinatorStorageSizeMB": {
+            "value": 131072
+        },
+        "workerVcores": {
+            "value": 4
+        },
+        "workerStorageSizeMB": {
+            "value": 524288
+        },
+        "numWorkers": {
+            "value": 0
+        },
+        "serverGroupTags": {
+            "value": {}
+        },
+        "workerNodeTags": {
+            "value": {}
+        },
+        "coordinatorNodeTags": {
+            "value": {}
+        },
+        "vnetData": {
+            "value": {}
+        },
+        "standbyCount": {
+            "value": 0
+        },
+        "enableHa": {
+            "value": false
+        },
+        "pgVersion": {
+            "value": "13"
+        }
+    }
+}

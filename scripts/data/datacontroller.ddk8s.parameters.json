@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "connectionMode": {
+            "value": "direct"
+        },
+        "uspAuthority": {
+            "value": "https://login.microsoftonline.com"
+        },
+        "infrastructure": {
+            "value": "onpremises"
+        },
+        "dockerRegistryCredential": {
+            "value": "arc-private-registry"
+        },
+        "dockerImagePullPolicy": {
+            "value": "Always"
+        },
+        "dockerImageTag": {
+            "value": "v1.0.0_2021-07-30"
+        },
+        "dockerRegistry": {
+            "value": "mcr.microsoft.com"
+        },
+        "dockerRepository": {
+            "value": "arcdata"
+        },
+        "dataStorageClass": {
+            "value": "local-storage"
+        },
+        "dataStorageSize": {
+            "value": "15Gi"
+        },
+        "logsStorageClass": {
+            "value": "local-storage"
+        },
+        "logsStorageSize": {
+            "value": "10Gi"
+        },
+        "serviceType": {
+            "value": "LoadBalancer"
+        },
+        "controllerPort": {
+            "value": 30080
+        },
+        "serviceProxyPort": {
+            "value": 30777
+        },
+        "apiVersion": {
+            "value": "2021-08-01"
+        }
+    }
+}

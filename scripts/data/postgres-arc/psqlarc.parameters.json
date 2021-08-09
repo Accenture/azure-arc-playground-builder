@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "admin": {
+            "value": "postgres"
+        },
+        "serviceType": {
+            "value": "LoadBalancer"
+        },
+        "dataStorageSize": {
+            "value": "5Gi"
+        },
+        "dataStorageClassName": {
+            "value": ""
+        },
+        "logsStorageSize": {
+            "value": "5Gi"
+        },
+        "logStorageClassName": {
+            "value": ""
+        },
+        "backupsStorageSize": {
+            "value": "5Gi"
+        },
+        "backupsStorageClassName": {
+            "value": ""
+        },
+        "resourceTags": {
+            "value": {}
+        },
+        "numWorkers": {
+            "value": 0
+        },
+        "extensions": {
+            "value": [
+                {
+                    "name": ""
+                },
+                {
+                    "name": "citus"
+                }
+            ]
+        },
+        "apiVersion": {
+            "value": "2021-07-01-preview"
+        }
+    }
+}

@@ -1,0 +1,149 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "administratorLogin": {
+            "type": "String"
+        },
+        "administratorLoginPassword": {
+            "type": "SecureString"
+        },
+        "location": {
+            "type": "String"
+        },
+        "serverGroup": {
+            "type": "String"
+        },
+        "coordinatorVcores": {
+            "type": "Int"
+        },
+        "coordinatorStorageSizeMB": {
+            "type": "Int"
+        },
+        "workerVcores": {
+            "type": "Int"
+        },
+        "workerStorageSizeMB": {
+            "type": "Int"
+        },
+        "numWorkers": {
+            "type": "Int"
+        },
+        "serverGroupTags": {
+            "defaultValue": {},
+            "type": "Object"
+        },
+        "workerNodeTags": {
+            "defaultValue": {},
+            "type": "Object"
+        },
+        "coordinatorNodeTags": {
+            "defaultValue": {},
+            "type": "Object"
+        },
+        "firewallRules": {
+            "defaultValue": {},
+            "type": "Object"
+        },
+        "vnetData": {
+            "defaultValue": {},
+            "type": "Object"
+        },
+        "standbyCount": {
+            "defaultValue": 0,
+            "type": "Int"
+        },
+        "enableHa": {
+            "defaultValue": false,
+            "type": "Bool"
+        },
+        "previewFeatures": {
+            "defaultValue": false,
+            "type": "Bool"
+        },
+        "pgVersion": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "api": "2020-10-05-privatepreview",
+        "serverGroupName": "[parameters('serverGroup')]",
+        "firewallRules": "[parameters('firewallRules').rules]",
+        "enablePublicIp": "[if(empty(parameters('vnetData')), bool('true'), bool('false'))]",
+        "vnetDataSet": "[if(empty(parameters('vnetData')), json('{ \"subnetArmResourceId\": \"\" }'), parameters('vnetData'))]",
+        "finalVnetData": "[json(concat('{ \"SubnetArmResourceId\": \"', variables('vnetDataSet').subnetArmResourceId, '\"}'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.DBforPostgreSQL/serverGroupsv2",
+            "apiVersion": "[variables('api')]",
+            "name": "[variables('serverGroupName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('serverGroupTags')]",
+            "properties": {
+                "createMode": "Default",
+                "administratorLogin": "citus",
+                "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+                "backupRetentionDays": 35,
+                "DelegatedSubnetArguments": "[if(empty(parameters('vnetData')), json('null'), variables('finalVnetData'))]",
+                "enableMx": false,
+                "enableZfs": false,
+                "previewFeatures": "[parameters('previewFeatures')]",
+                "postgresqlVersion": "[parameters('pgVersion')]",
+                "serverRoleGroups": [
+                    {
+                        "name": "",
+                        "role": "Coordinator",
+                        "serverCount": 1,
+                        "serverEdition": "GeneralPurpose",
+                        "vCores": "[parameters('coordinatorVcores')]",
+                        "storageQuotaInMb": "[parameters('coordinatorStorageSizeMB')]",
+                        "enableHa": "[parameters('enableHa')]"
+                    },
+                    {
+                        "name": "",
+                        "role": "Worker",
+                        "serverCount": "[parameters('numWorkers')]",
+                        "serverEdition": "MemoryOptimized",
+                        "vCores": "[parameters('workerVcores')]",
+                        "storageQuotaInMb": "[parameters('workerStorageSizeMB')]",
+                        "enableHa": "[parameters('enableHa')]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "[concat(variables('serverGroupName'), concat('-firewallRules-', copyIndex()))]",
+            "dependsOn": [
+                "[concat('Microsoft.DBforPostgreSQL/serverGroupsv2/', variables('serverGroupName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.DBforPostgreSQL/serverGroupsv2/firewallRules",
+                            "name": "[concat(variables('serverGroupName'),'/',variables('firewallRules')[copyIndex()].name)]",
+                            "apiVersion": "[variables('api')]",
+                            "properties": {
+                                "startIpAddress": "[variables('firewallRules')[copyIndex()].startIPAddress]",
+                                "endIpAddress": "[variables('firewallRules')[copyIndex()].endIPAddress]"
+                            }
+                        }
+                    ]
+                }
+            },
+            "copy": {
+                "name": "firewallRulesIterator",
+                "count": "[if(greater(length(variables('firewallRules')), 0), length(variables('firewallRules')), 1)]",
+                "mode": "Serial"
+            },
+            "condition": "[greater(length(variables('firewallRules')), 0)]"
+        }
+    ],
+    "outputs": {}
+}

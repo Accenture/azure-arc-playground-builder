@@ -1,0 +1,70 @@
+# !/bin/bash
+# azcli script version of Powershell found here: https://github.com/Azure/aks-hci/blob/main/eval/steps/1_AKSHCI_Azure.md#option-2---creating-the-azure-vm-with-powershell
+# Troubleshooting information here: https://github.com/Azure/aks-hci/blob/main/eval/steps/1_AKSHCI_Azure.md#troubleshooting
+# DSC may encounter a failure with VM restarts during creation
+# deploys Windows Server 2019 VM in Azure and configures AksHci host using DSC
+
+# VARIABLES
+RAND="$(echo $RANDOM | tr '[0-9]' '[a-z]')" # random unique characters for idempotent creation
+resourceGroup="azstack-hci-${RAND}"
+location="eastus" # To check available locations, run az-account list-locations #
+timeStamp=$(date +'%Y-%m-%dT%H%M%S')
+deploymentName="AksHciDeploy_${timeStamp}"
+
+# ARM TEMPLATE PARAMETERS
+vmName="AKSHCIHost001"
+vmSize="Standard_E8s_v4"
+vmGeneration="Generation 2" # Or Generation 1
+domainName="akshci.local"
+dataDiskType="StandardSSD_LRS"
+dataDiskSize="32"
+adminUsername="azureuser"
+adminPassword=""
+enableDHCP="Enabled" # Or Disabled #
+customRdpPort="3389" # Between 0 and 65535 #
+autoShutdownStatus="Enabled" # Or Disabled #
+autoShutdownTime="23:00"
+autoShutdownTimeZone='Eastern Standard Time' # To list timezones, run [System.TimeZoneInfo]::GetSystemTimeZones() |ft -AutoSize
+existingWindowsServerLicense="No" # See NOTE 2 below on Azure Hybrid Benefit
+publicIpName='AKSHCILabPubIP'
+
+# CLEANUP RESOURCES SCRIPT
+echo "################# BEGIN CLEANUP SCRIPT #################"
+echo az group delete --no-wait -y --name $resourceGroup
+echo "################# END CLEANUP SCRIPT ###################"
+
+
+# Create Resource Group
+echo -n "Creating resource group ${resourceGroup}..."
+az group create -n $resourceGroup -l $location -o none --only-show-errors
+echo 'done.'
+
+echo 'Deploying AKS HCI Host ARM template (this will take a few minutes)...'
+# Deploy ARM Template
+az deployment group create \
+    --resource-group $resourceGroup \
+    --name $deploymentName \
+    --template-uri 'https://raw.githubusercontent.com/Azure/aks-hci/main/eval/json/akshcihost.json' \
+    --only-show-errors \
+    --output none \
+    --parameters \
+        virtualMachineName="$vmName" \
+        virtualMachineSize="$vmSize" \
+        virtualMachineGeneration="$vmGeneration" \
+        domainName="$domainName" \
+        dataDiskType="$dataDiskType" \
+        dataDiskSize="$dataDiskSize" \
+        adminUsername="$adminUsername" \
+        adminPassword="$adminPassword" \
+        enableDHCP="$enableDHCP" \
+        customRdpPort="$customRdpPort" \
+        autoShutdownStatus="$autoShutdownStatus" \
+        autoShutdownTime="$autoShutdownTime" \
+        autoShutdownTimeZone="$autoShutdownTimeZone" \
+        alreadyHaveAWindowsServerLicense="$existingWindowsServerLicense"
+
+echo 'ARM template deployment done.'
+# Get connection details of the newly created VM
+az vm show -g $resourceGroup -n $vmName -o table
+
+az network public-ip show -n  $publicIpName -g $resourceGroup -o table
