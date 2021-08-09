@@ -1,17 +1,17 @@
-# Deploy Azure App Service on Azure Arc connected Docker Desktop Kubernetes
-This demo will instruct how to run the ddk8s.azcli script to accomplish: 
+# Deploy Azure App Service on Azure Arc Docker Desktop Single Node Kubernetes
+This document will instruct how to run the [deploy-arc-ddk8s.azcli](scripts/deploy-arc-ddk8s.azcli) script to accomplish: 
 - Connect a local Docker Desktop single-node Kubernetes cluster to Azure Arc
 - Install Azure App Service Extensions (Preview)
 - Deploy a Hello World web app to the Azure App Service running in a local K8s cluster on Docker Desktop.
 - [Optional] Install Azure Arc data services with Arc PostgreSQL Hyperscale
 
-This demo assumes running on a local host with the following ports exposed to internet: 80, 443, 8081. You will likely need admin access to your local network.
+This documentation assumes running on a local host with the following ports exposed to internet: 80, 443, 8081. You will need admin access to your local network.
 
-These instructions are also applicable with a public cloud provider VM having the same port configuration.
+These instructions are also applicable with a public cloud provider VM having the same networking port configuration.
 
 ## Prerequisites
 ### Machine setup and WSL2 install on Windows
-- [Set up your Workstation](https://github.com/lyledodgegh/aite/blob/main/articles/setup-wsl-azure-developer-machine.md)
+- [Set up your Workstation](prerequisites.md)
 - Ensure azure-cli version 2.26.0 or 2.26.1 are not installed (see Known Issues)
 
     ```bash
@@ -21,19 +21,10 @@ These instructions are also applicable with a public cloud provider VM having th
     az upgrade
     ```
 
-- Install the latest version of [helm](https://helm.sh/docs/intro/install/#from-apt-debianubuntu) on your WSL2 terminal
-
-    ```bash
-    curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
-    sudo apt-get install apt-transport-https --yes
-    echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-    sudo apt-get update
-    sudo apt-get install helm
-    ```
-
 - Install the latest version of [yq](https://mikefarah.gitbook.io/yq/#install) on your WSL2 terminal
 
     ```bash
+    # yq is only required by this script, not required when targeting an AKS cluster
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
     sudo add-apt-repository ppa:rmescandon/yq
     sudo apt update
@@ -114,7 +105,7 @@ The following arguments are available in the deploy-arc-ddk8s script.
 
 ## Troubleshooting
 ### Kubernetes services external IP does not include localhost
-Each time before running the Docker Desktop demo script, ensure to reset the Kubernetes cluster and stop and start (not restart) Docker Desktop. Failure to quit and start Docker Desktop so will cause the envoy Kubernetes service to not receive localhost ip assignment as an ExternalIP. Underlying issue is described [here](https://github.com/docker/for-mac/issues/4903)
+Each time before running the Docker Desktop script, ensure to reset the Kubernetes cluster and stop and start (not restart) Docker Desktop. Failure to quit and start Docker Desktop so will cause the envoy Kubernetes service to not receive localhost ip assignment as an ExternalIP. Underlying issue is described [here](https://github.com/docker/for-mac/issues/4903)
 ### Fail to install Arc App Service extensions on local cluster
 Enabling KEDA on the app service k8s extension will cause the install to fail
 ### Fail to install Azure CLI connectedk8s extension

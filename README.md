@@ -1,43 +1,19 @@
-# project-lima-demo
+# Azure Arc App & Data Services Quickstart
+This repo contains infrastructure-as-code automation scripts & templates to deploy an Azure Arc quickstart Hello World app. This quickstart highlights recently announced Azure Arc App Service & Data capabilities. The intention of this repo is to accelerate local Arc App service & Data on Arc enabled Kubernetes prototyping.
 
-## Prepare the workstation
+The set of scripts & templates in this repo do the following:
+1. Create an Azure Arc connected Kubernetes cluster, either AKS or Docker Desktop single node clusters
+1. Create Azure App Service and Azure Data services on top of the Arc connected Kubernetes cluster
+1. Deploy & configure a Hello World web app on Arc App Service and connect to the Arc Data services backend, either SQL Managed Instance or PostgreSQL
 
-- [Set up your Workstation](https://github.com/lyledodgegh/aite/blob/main/articles/setup-wsl-azure-developer-machine.md)
+## Prerequisites
 
-## Demo deployment scripts
+- [Set up your Workstation](prerequisites.md)
 
-- [Arc App Service on Docker Desktop](scripts/deploy-arc-ddk8s.azcli)
-- [Arc App Service + Arc SQL Managed Instance or PostgreSQL Hyperscale on AKS](scripts/deploy-arc-aks.azcli)
+## Deployment Scripts
 
-## Key Takeaways
+- [Arc App Service + Arc SQL Managed Instance or PostgreSQL Hyperscale on AKS](deploying-arc-aks.md)
+- [Arc App Service on local Docker Desktop](deploying-arc-appservice-ddk8s.md)
 
-- I can modernize without migrating
-- I can use Azure application platform on Kubernetes
-- I understand the options for state management on Kubernetes and Azure multitenant
-- I understand the new gitops through arc for kubernetes deployment models
-
-## Showcase Demo Scope
-
-- Read the [AMBG Lima ViewPoint](https://ts.accenture.com/sites/AMBGAdvisory-Seattle-MicrosoftProjectLima/Shared%20Documents/Microsoft%20Project%20Lima/AMBG%20Viewpoint%20-%20Microsoft%20Project%20Lima.pptx?web=1)
-- This repo should serve as build/run/deployable bits for anyone with an Azure subscription. The demo scope:
-  - Something simple - a web app (Azure web app) backed by a data store (sql server)
-  - Deploy the solution on Azure multitenant (Azure App Service + Azure SQL Database)
-  - Deploy the solution on Azure Kubernetes Service (LIMA with SQL Containers)
-  - Deploy the solution on on-premises Kubernetes (tbd - Kind? Minikube? Commercial k8s in a VM?)
-
-## Relevant Software and Documentation Links
-
-- todo - public docs
-- todo - azure stack hci download
-
-## Environment Setup and Instructions
-
-1. Review the base landing at [github.com/microsoft/project-lima-private-preview](https://github.com/microsoft/project-lima-private-preview).
-1. Work with an Accenture employee that has an Azure subscription that has already been onboarded with EUAP access to features (currently l.dodge and l.beck).
-    1. [AMBG Studios Azure Subscription - Access](https://ts.accenture.com/sites/AMBGAdvisory-Seattle/SitePages/Access-to-the-Studio-Azure-Subscription.aspx)
-1. Prepare a developer machine:
-    1. [Setting up a WSL based Azure Developer Machine](https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine.html)
-1. Setup Azure Kubernetes Service on Azure Stack HCI
-    1. [Azure Stack HCI Download](https://azure.microsoft.com/products/azure-stack/hci/hci-download/)
-        1. `Invoke-WebRequest -Uri <source> -OutFile <destination>`
-        1. [Install Windows Admin Center on Azure Stack HCI](https://docs.microsoft.com/windows-server/manage/windows-admin-center/deploy/install)
+## Next Steps
+Checkout Microsoft's [Azure Arc Jumpstart - ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/). ArcBox is larger-scale Arc sandbox, enabling you to evaluate Azure Arc scenarios on a more "on-prem" production-like Kubernetes environment.
