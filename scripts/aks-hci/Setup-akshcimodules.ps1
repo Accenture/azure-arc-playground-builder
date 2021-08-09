@@ -1,5 +1,5 @@
 # Login to Azure
-Connect-AzAccount -Tenant 580fb630-a6a8-4c62-b9d0-ad28387a279a -
+Connect-AzAccount -Tenant <id> -
 
 # Optional - if you wish to switch to a different subscription
 # First, get all available subscriptions as the currently logged in user
