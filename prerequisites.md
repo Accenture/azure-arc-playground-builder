@@ -20,6 +20,7 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 # Install go
 wget https://golang.org/dl/go1.16.7.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.16.7.linux-amd64.tar.gz
+rm go1.16.7.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 
 # Install kubectl, kubelet, kubeadm
