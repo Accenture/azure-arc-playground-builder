@@ -2,10 +2,11 @@
 
 @{
     ViewData["Title"] = "Todo List";
+    var dbType = ViewData["DatabaseType"];
 }
 
 <h2>Todo List</h2>
-
+<p>Database Type: @dbType</p>
 <p>
     <a asp-action="Create">Create New</a>
 </p>

@@ -500,16 +500,7 @@ function create_pgsql(){
             resourceGroup="${rg}" \
             resourceName="${pgsql_server_name}"
     
-    pgsql_primary_endpoint=$(az resource show -o tsv -g $rg -n $pgsql_server_name --resource-type microsoft.azurearcdata/postgresinstances --query properties.k8sRaw.status.primaryEndpoint --only-show-errors) >/dev/null
     pgsql_id=$(az resource show -o tsv -g $rg -n $pgsql_server_name --resource-type microsoft.azurearcdata/postgresinstances --query id --only-show-errors) >/dev/null
-
-    if [[ -z "${pgsql_primary_endpoint}" ]] || [[ -z "${pgsql_id}" ]]; then
-        echo_reset_err 'Error: failed to create hyperscale postgresql server on AKS cluster'
-        exit 1
-    fi
-    echo 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...done'
-    log_resource_id ${pgsql_id}
-    echo "PostgreSQL External Endpoint: ${pgsql_primary_endpoint}"
 
     echo -n 'Waiting for PostgreSQL to be in ready state...'
     if ! az resource wait -o none --only-show-errors --timeout $MAX_WAIT_SECONDS --ids $pgsql_id --resource-type 'microsoft.azurearcdata/postgresinstances' --custom "properties.k8sRaw.status.state=='Ready'" >/dev/null; then
@@ -518,6 +509,16 @@ function create_pgsql(){
     fi
     echo 'Waiting for PostgreSQL to be in ready state...done.'
 
+    pgsql_primary_endpoint=$(az resource show -o tsv -g $rg -n $pgsql_server_name --resource-type microsoft.azurearcdata/postgresinstances --query properties.k8sRaw.status.primaryEndpoint --only-show-errors) >/dev/null
+
+    if [[ -z "${pgsql_primary_endpoint}" ]] || [[ -z "${pgsql_id}" ]]; then
+        echo_reset_err 'Error: failed to create hyperscale postgresql server on AKS cluster'
+        exit 1
+    fi
+    echo 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...done'
+    log_resource_id ${pgsql_id}
+    echo "PostgreSQL External Endpoint: ${pgsql_primary_endpoint}"
+    
     # set the PostgreSQL connection string using K8s DNS, <service>.<namespace>
     CONN_STRINGS[$rg]="Host=${pgsql_server_name}-external-svc.${ARC_DATA_NAMESPACE};Port=5432;Database=postgres;Username=postgres;Password=${AZDATA_PASSWORD};SslMode=Disable"
 }

@@ -10,14 +10,29 @@ namespace HelloWorld.Controllers
     public class TodoItemsController : Controller
     {
         private readonly TodoContext _context;
+        private readonly string _databaseType = string.Empty;
 
         public TodoItemsController(TodoContext context)
         {
             _context = context;
+            
+            if (_context.Database.IsNpgsql())
+            {
+                _databaseType = "PostgreSQL Hyperscale";
+            }
+            else if (_context.Database.IsSqlServer())
+            {
+                _databaseType = "SQL Server Managed Instance";
+            }
+            else
+            {
+                _databaseType = "In Memory";
+            }
         }
 
         public async Task<IActionResult> Index()
         {
+            ViewData["DatabaseType"] = _databaseType;
             return View(await _context.TodoItems.ToListAsync());
         }
 
