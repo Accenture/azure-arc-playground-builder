@@ -399,7 +399,7 @@ function create_arc_data_service() {
     fi
     echo "done."
 
-    exit 0
+    
 
     echo -n 'Deploying ARM template for Azure Data Controller in Directly Connected Mode (this may take a few minutes)...'
     az group deployment create \
@@ -515,16 +515,15 @@ function print_usage(){
     HELP_FLAG=true
     echo '''Usage: ./deploy-arc-ddk8s.azcli [arguments]
 Arguments
-  --location -l       [Required]  : The azure region to deploy all resources.
-                                    Valid values: eastus, westeurope.
-  --cluster-name -n   [Required]  : The name to describe the host machine running the Docker Desktop cluster.
-  --create-arc-data   [Preview]   : Create arc data services in addition to appservice.
-                                    This argument is still in development.
-                                    Only choose to create data services if local machine has sufficient resources.
-  --spn-id                        : Service principal client id.
-  --spn-secret                    : Service principal client secret.
-  --sql-username                  : Sql admin username.
-  --sql-password                  : Sql admin password.
+  --location -l       [Required]       : The azure region to deploy all resources.
+                                         Valid values: eastus, westeurope.
+  --cluster-name -n   [Required]       : The name to describe the host machine running the Docker Desktop cluster.
+  --create-arc-data   [In Development] : Create arc data services in addition to appservice.
+                                         This argument is still in development.
+  --spn-id                             : Service principal client id.
+  --spn-secret                         : Service principal client secret.
+  --sql-username                       : Sql admin username.
+  --sql-password                       : Sql admin password.
 
 Examples
     Create an Azure WebApp on Arc-connected local Docker Desktop K8s clusterregistered to eastus region.
@@ -551,7 +550,7 @@ case "$1" in
     -l | --location)        REGION="$2" ; shift 2 ;;
     -n | --cluster-name)    LOCAL_HOST_NAME="$2" ; shift 2 ;;
     -h | --help)            print_usage  ; shift   ;;
-    --create-arc-data)      CREATE_ARC_DATA_SERVICES=false  ; shift   ;;
+    --create-arc-data)      CREATE_ARC_DATA_SERVICES=true  ; shift   ;;
     --spn-id)               SP_CLIENT_ID="$2"  ; shift 2  ;;
     --spn-secret)           SP_SECRET="$2"  ; shift 2 ;;
     --sql-username)         export AZDATA_USERNAME="$2"  ; shift 2  ;;
@@ -626,7 +625,7 @@ echo "Creating Log Analytics Workspace...done."
 log_resource_id $workspace_resource_id
 
 # Create Arc-Enabled K8s CLuster
-echo "Switching kubectx to docker-desktop..."
+echo -n "Switching kubectx to docker-desktop..."
 if ! kubectx docker-desktop >/dev/null; then
     echo 'Error: failed to set kubectl context to "docker-desktop". Please check docker desktop is installed correctly.' >&2
     exit 1
@@ -652,10 +651,10 @@ CONNECTED_CLUSTER_ID=$(az connectedk8s show -g $RESOURCE_GROUP -n $CLUSTER_NAME 
 echo 'Connecting DD K8s cluster to Azure Arc (this will take a few minutes)...done.'
 
 if [[ "${CREATE_ARC_DATA_SERVICES}" == 'true' ]]; then
-    create_arc_data_service 
+    # create_arc_data_service 
+    echo 'Arc data services quickstart on Docker Desktop Kubernetes is still in development. Skipping creation of data services.'
+    CREATE_ARC_DATA_SERVICES=false
 fi
-
-exit 
 
 echo -n "Installing app service extensions in dd k8s cluster (this will take a few minutes)..."
 APPSERVICE_EXTENSION_ID=$(
