@@ -8,7 +8,7 @@
 
 ### WSL2 tooling setup
 
-Run these commands in your WSL2 Linux terminal
+Run these commands in your WSL2 Linux terminal. This script below assumes you're using Windows 10 or Windows 11, with WSL2, and using Ubuntu 20.04, which is the default verison when picking Ubuntu from the Microsoft Store.
 
 ```bash
 # Disable WSL2 login message and update packages
@@ -47,6 +47,17 @@ sudo mv ./kind /usr/local/bin/
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
 chmod +x get_helm.sh
 ./get_helm.sh
+
+# Python3 pip
+sudo apt install python3-pip
+
+# Azure Data CLI
+sudo apt-get update
+sudo apt-get install gnupg ca-certificates curl wget software-properties-common apt-transport-https lsb-release -y
+curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
+sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/20.04/prod.list)"
+sudo apt-get update
+sudo apt-get install -y azdata-cli
 ```
 
 ## Docker setup
