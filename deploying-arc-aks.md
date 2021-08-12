@@ -5,12 +5,12 @@ The [deploy-arc-aks.azcli](scripts/deploy-arc-aks.azcli) script will deploy a He
 ## Prerequisites
 
 1. [Set up your Workstation](prerequisites.md)
-1. Ensure azure-cli versions 2.26.0 or 2.26.1 are not installed (see [Troubleshooting](#troubleshooting))
+1. Ensure latest azure-cli version is installed
 
     ```bash
     # check azure-cli version
     az version
-    # upgrade to 2.27.* if needed
+    # upgrade to at least 2.27.* if needed
     az upgrade
     ```
 ## Executing the script
@@ -43,7 +43,3 @@ The deploy-arc-aks.azcli script receives the following arguments:
 - [Azure Arc Data Controller - Direct Connectivity](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-data-controller-direct-cli)
 - [Arc-enabled Azure SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-sql-managed-instance)
 - [Arc-enabled Azure PostgreSQL Hyperscale](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-postgresql-hyperscale-server-group)
-
-
-## Troubleshooting
-- Azure CLI versions 2.26.1 & 2.26.0 fail during extension commands. Upgrade to 2.27.*, or downgrade to known working version: 2.25.0-1.

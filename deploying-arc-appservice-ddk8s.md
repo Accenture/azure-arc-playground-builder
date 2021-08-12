@@ -18,12 +18,12 @@ These instructions are also applicable with a public cloud provider VM having th
     memory=16GB # Limits VM memory in WSL 2 to 16 GB
     processors=4 # Makes the WSL 2 VM use 4 virtual processors
     ```
-- Ensure azure-cli version 2.26.0 or 2.26.1 are not installed
+- Ensure latest azure-cli version is installed
 
     ```bash
     # check azure-cli version
     az version
-    # upgrade to 2.27.* if needed
+    # upgrade to at least 2.27.* if needed
     az upgrade
     ```
 
@@ -111,10 +111,6 @@ The following arguments are available in the deploy-arc-ddk8s script.
 ## Troubleshooting
 ### Kubernetes services external IP does not include localhost
 Each time before running the Docker Desktop script, ensure to reset the Kubernetes cluster and stop and start (not restart) Docker Desktop. Failure to quit and start Docker Desktop so will cause the envoy Kubernetes service to not receive localhost ip assignment as an ExternalIP. Underlying issue is described [here](https://github.com/docker/for-mac/issues/4903)
-### Fail to install Arc App Service extensions on local cluster
-Enabling KEDA on the app service k8s extension will cause the install to fail
-### Fail to install Azure CLI connectedk8s extension
-Azure CLI v2.26.0 and v2.26.1 currently encounters issues when installing CLI connectedk8s cli extension. See this GitHub issue for more details https://github.com/Azure/azure-cli/issues/18797
 ### Unable to deploy or connect to Azure App Service
 Ensure your port forwarding or network security group allows inbound and outbound traffic on 443, 80, and 8081.
 ### App Service extension build service pods are stuck in pending
