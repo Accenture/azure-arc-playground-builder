@@ -4,7 +4,6 @@
 
 # Prerequisites
 # setup your workstation - https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine
-# install azdata cli - https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata?view=sql-server-ver15
 # login to azure cli 'az login'
 # if you have multiple subscriptions, also run 'az account -s <subscription-name-or-guid>'
 
@@ -88,12 +87,6 @@ function check_prereqs() {
         echo ""
         is_error=true
         echo "Error: azure-cli version ${az_version} is currently installed. There is a known issue with ${az_version} installing connectedk8s extensions. Please downgrade to 2.25.0 https://aka.ms/install-azure-cli" >&2
-    fi
-
-    if ! azdata &>/dev/null; then
-        echo ""
-        is_error=true
-        echo "Error: Could not find azure data cli installed. Double check azure data cli is installed. https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata" >&2
     fi
 
     # check for azure subscription logged in

@@ -116,13 +116,6 @@ function check_prereqs() {
 
     if [[ "${CREATE_ARC_DATA_SERVICES}" == 'true' ]]; then
         echo -n 'arc data services enabled...'
-
-        if ! azdata &>/dev/null; then
-            echo ""
-            is_error=true
-            echo "Error: Could not find azure data cli installed. Double check azure data cli is installed. https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata" >&2
-        fi
-
     fi
 
     # if subscription was found easily get the tenantId
