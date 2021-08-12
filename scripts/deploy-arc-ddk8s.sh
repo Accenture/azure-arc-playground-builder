@@ -2,13 +2,6 @@
 
 # Connect Existing Docker Desktop Single Node K8s to Azure Arc and Deploy Hello World on Local App Service
 
-# Prerequisites
-# setup your workstation - https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine
-# install latest version of helm - https://helm.sh/docs/intro/install/
-# install yq - https://mikefarah.gitbook.io/yq/#install
-# login to azure cli 'az login'
-# if account has multiple subscriptions, run 'az account -s <subscription-name-or-guid>'
-
 # FLAGS
 # Alter these values to control how resources are deployed
 LOCAL_HOST_NAME='' 

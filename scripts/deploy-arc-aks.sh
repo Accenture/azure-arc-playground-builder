@@ -2,11 +2,6 @@
 
 # Deploy Azure Arc-connected AKS clusters and deploy app service on K8s hello world connecting Arc Data Services SQL MI or PGSQL Hyperscale
 
-# Prerequisites
-# setup your workstation - https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine
-# login to azure cli 'az login'
-# if you have multiple subscriptions, also run 'az account -s <subscription-name-or-guid>'
-
 # FLAGS
 SQL_ADMIN_PW=''
 SP_CLIENT_ID=''
