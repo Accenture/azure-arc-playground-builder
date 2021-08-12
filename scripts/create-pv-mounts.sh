@@ -1,7 +1,6 @@
 # !/bin/bash
 
-# Create directories and mount points to be used for persistent volumes
-# this should be run when docker deamon is not running.
+# Create WSL2 directories and mountpoints to be used for persistent volumes
 # Reference: https://github.com/docker/for-win/issues/5325#issuecomment-567594291
 
 base_dir='/mnt/arcdata'
