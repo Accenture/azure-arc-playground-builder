@@ -8,7 +8,7 @@ The set of scripts & templates in this repo do the following:
 
 ## Prerequisites
 
-- [Set up your Workstation](prerequisites.md)
+- [Set up Workstation](prerequisites.md)
 
 ## Deployment Scripts
 
