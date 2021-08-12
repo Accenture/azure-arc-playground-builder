@@ -1,5 +1,5 @@
 # Deploy Azure App Service on Azure Arc Docker Desktop Single Node Kubernetes
-This document will instruct how to run the [deploy-arc-ddk8s.azcli](scripts/deploy-arc-ddk8s.azcli) script to accomplish: 
+This document describes how to run the [deploy-arc-ddk8s.azcli](scripts/deploy-arc-ddk8s.azcli) script to accomplish: 
 - Connect a local Docker Desktop single-node Kubernetes cluster to Azure Arc
 - Install Azure App Service Extensions (Preview)
 - Deploy a Hello World web app to the Azure App Service running in a local K8s cluster on Docker Desktop.
@@ -120,5 +120,5 @@ Ensure your port forwarding or network security group allows inbound and outboun
 ### App Service extension build service pods are stuck in pending
 A persistent volume is not created during app service extension helm chart install. 
 The script will create it for you based on the yml file in scripts/appservice-extensions/pv.yml.
-Ensure the persistent volume is created and the path /mnt/persistent-volume exists.
+Ensure the persistent volume is created.
 Ensure the persistent volume claim is created.
