@@ -46,6 +46,7 @@ APPSERVICE_EXTENSION_ID=''
 CUSTOM_LOCATION_ID=''
 HOST=''
 URL=''
+LOCAL_STORAGE_YAML='data/local-storage.yml'
 
 ## Arc Data Controller
 ARCDC_ARM_TEMPLATE='data/datacontroller.template.json'
@@ -115,13 +116,6 @@ function check_prereqs() {
 
     if [[ "${CREATE_ARC_DATA_SERVICES}" == 'true' ]]; then
         echo -n 'arc data services enabled...'
-
-        if ! azdata &>/dev/null; then
-            echo ""
-            is_error=true
-            echo "Error: Could not find azure data cli installed. Double check azure data cli is installed. https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata" >&2
-        fi
-
     fi
 
     # if subscription was found easily get the tenantId
@@ -308,6 +302,28 @@ function log_resource_id() {
 }
 
 ##############################################################
+# Create local storage persistent volume provisioner
+# Globals:
+#   None
+# Arguments:
+#   None
+##############################################################
+function create_local_storage_provisioner(){
+    echo -n 'Creating local storage provisioner on local cluster...'
+    
+    if ! kubectl apply -f $LOCAL_STORAGE_YAML >/dev/null; then
+        echo_reset_err 'Failed to setup local storage provisioner on local cluster'
+        exit 1
+    fi
+
+    if ! kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}' >/dev/null; then
+        echo_reset_err 'Failed to setup local storage provisioner on local cluster'
+        exit 1
+    fi
+    echo 'done.'
+}
+
+##############################################################
 # Creates Arc Data Services with PostgreSQL Hyperscale
 # Globals:
 #   LOG_RESOURCES
@@ -399,8 +415,6 @@ function create_arc_data_service() {
     fi
     echo "done."
 
-    
-
     echo -n 'Deploying ARM template for Azure Data Controller in Directly Connected Mode (this may take a few minutes)...'
     az group deployment create \
     -n $arc_dc_deployment \
@@ -453,14 +467,6 @@ function create_arc_data_service() {
         exit 1
     fi
     echo 'Waiting for Azure Arc Data Controller to be in ready state...done.'
-
-    echo -n 'Connecting azdata cli to Azure Arc Data Controller...'
-    # Connect to the data controller
-    if ! azdata login -ns $ARC_DATA_NAMESPACE --username $AZDATA_USERNAME >/dev/null; then
-        echo_reset_err 'Error: failed to login to Azure Arc Data Controller on AKS cluster'
-        exit 1
-    fi
-    echo 'done.'
 
     # Create postgresql hyperscale server
     echo -n 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...'
@@ -651,9 +657,13 @@ CONNECTED_CLUSTER_ID=$(az connectedk8s show -g $RESOURCE_GROUP -n $CLUSTER_NAME 
 echo 'Connecting DD K8s cluster to Azure Arc (this will take a few minutes)...done.'
 
 if [[ "${CREATE_ARC_DATA_SERVICES}" == 'true' ]]; then
-    # create_arc_data_service 
-    echo 'Arc data services quickstart on Docker Desktop Kubernetes is still in development. Skipping creation of data services.'
-    CREATE_ARC_DATA_SERVICES=false
+    if ! create_local_storage_provisioner; then
+        exit 1
+    fi
+
+    if ! create_arc_data_service; then
+        exit 1
+    fi
 fi
 
 echo -n "Installing app service extensions in dd k8s cluster (this will take a few minutes)..."
@@ -824,7 +834,7 @@ log_resource_id $APPSERVICE_RESOURCE_ID
 
 if [[ "${CREATE_ARC_DATA_SERVICES}" == 'true' ]]; then
     echo -n 'Adding PostgreSQL connection string to app service config...'
-    if ! az webapp config appsettings set -g $rg -n $app_service_name --settings $APPSERVICE_PGSQL_CONN_STR_KEY="${POSTGRES_CONN_STRINGS[$RESOURCE_GROUP]}" >/dev/null; then
+    if ! az webapp config appsettings set -g $RESOURCE_GROUP -n $APPSERVICE_NAME --settings $APPSERVICE_PGSQL_CONN_STR_KEY="${POSTGRES_CONN_STRINGS[$RESOURCE_GROUP]}" >/dev/null; then
         echo_reset_err "Error: failed to configure PostgreSQL connection string in App Service ${app_service_name}"
         exit 1
     fi

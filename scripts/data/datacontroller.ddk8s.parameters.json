@@ -30,13 +30,13 @@
             "value": "local-storage"
         },
         "dataStorageSize": {
-            "value": "15Gi"
+            "value": "6Gi"
         },
         "logsStorageClass": {
             "value": "local-storage"
         },
         "logsStorageSize": {
-            "value": "10Gi"
+            "value": "6Gi"
         },
         "serviceType": {
             "value": "LoadBalancer"

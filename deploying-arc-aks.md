@@ -5,7 +5,7 @@ The [deploy-arc-aks.azcli](scripts/deploy-arc-aks.azcli) script will deploy a He
 ## Prerequisites
 
 1. [Set up your Workstation](prerequisites.md)
-1. Ensure azure-cli versions 2.26.0 or 2.26.1 are not installed (see Known Issues)
+1. Ensure azure-cli versions 2.26.0 or 2.26.1 are not installed (see [Troubleshooting](#troubleshooting))
 
     ```bash
     # check azure-cli version
@@ -45,5 +45,5 @@ The deploy-arc-aks.azcli script receives the following arguments:
 - [Arc-enabled Azure PostgreSQL Hyperscale](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-postgresql-hyperscale-server-group)
 
 
-## Known Issues
-- Azure CLI versions 2.26.1 & 2.26.0 currently fail during extension commands. Please use a newer version, or downgrade to known working version: 2.25.0-1.
+## Troubleshooting
+- Azure CLI versions 2.26.1 & 2.26.0 fail during extension commands. Upgrade to 2.27.*, or downgrade to known working version: 2.25.0-1.

@@ -1,18 +1,24 @@
 # Deploy Azure App Service on Azure Arc Docker Desktop Single Node Kubernetes
-This document will instruct how to run the [deploy-arc-ddk8s.azcli](scripts/deploy-arc-ddk8s.azcli) script to accomplish: 
+This document describes how to run the [deploy-arc-ddk8s.azcli](scripts/deploy-arc-ddk8s.azcli) script to accomplish: 
 - Connect a local Docker Desktop single-node Kubernetes cluster to Azure Arc
 - Install Azure App Service Extensions (Preview)
 - Deploy a Hello World web app to the Azure App Service running in a local K8s cluster on Docker Desktop.
 - [Optional] Install Azure Arc data services with Arc PostgreSQL Hyperscale
 
-This documentation assumes running on a local host with the following ports exposed to internet: 80, 443, 8081. You will need admin access to your local network.
+This documentation assumes running on a local host with the following ports exposed to internet: 80, 443, 8081. Access to network port forward configuration is required.
 
 These instructions are also applicable with a public cloud provider VM having the same networking port configuration.
 
 ## Prerequisites
 ### Machine setup and WSL2 install on Windows
 - [Set up your Workstation](prerequisites.md)
-- Ensure azure-cli version 2.26.0 or 2.26.1 are not installed (see Known Issues)
+- If deploying Arc data services, this is the recommended resources WSL2 config. Smaller configurations might be insufficient to run both Arc Data Services + Arc App Service
+    ```
+    [wsl2]
+    memory=16GB # Limits VM memory in WSL 2 to 16 GB
+    processors=4 # Makes the WSL 2 VM use 4 virtual processors
+    ```
+- Ensure azure-cli version 2.26.0 or 2.26.1 are not installed
 
     ```bash
     # check azure-cli version
@@ -31,8 +37,6 @@ These instructions are also applicable with a public cloud provider VM having th
     sudo apt install yq -y
     ```
 
-- If deploying Arc Data Services, install the [azure data cli](https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata?toc=%2Fazure%2Fazure-arc%2Fdata%2Ftoc.json&bc=%2Fazure%2Fazure-arc%2Fdata%2Fbreadcrumb%2Ftoc.json&view=sql-server-ver15#os-specific-instructions) on your WSL2 terminal
-
 - Login to your Azure Subscription using the azure-cli on your WSL2 terminal: 
 
     ```bash
@@ -48,16 +52,20 @@ These instructions are also applicable with a public cloud provider VM having th
 
     ![Reset Docker Desktop K8s](images/reset-k8s-sm.png)
 
-- Stop and Start Docker Desktop (do not restart, see Known Issues)
+- Stop and Start Docker Desktop (do not restart, see [Troubleshooting](#troubleshooting))
 
     ![Stop and Start Docker Desktop](images/stop-docker.png)
-- Create the directory used as a Kubernetes persistent Volume
-    ```bash
-    sudo mkdir /mnt/persistent-volume
-    sudo chmod -R u=rwx,g=rw,o=rw /mnt/persistent-volume
-    ```
 
-### Setup port forwarding to your local machine 
+### Create WSL2 mountpoints for persistent volume storage
+This step is only required if creating data services. Arc Data services created by this script use dynamically provisioned local-storage persistent volumes. Docker Desktop WSL2 uses cross distro mounts. Mountpoints must be created in /mnt/wsl to be made available as viable volume mounts for Kubernetes pods. See [create-pv-mounts.sh](scripts/create-pv-mounts.sh) for more details. See this [thread](https://github.com/docker/for-win/issues/5325#issuecomment-567594291) for more WSL2 Docker Desktop mountpoint details. 
+
+Execute the script to create directories & mountpoints in the WSL2 terminal. 
+
+```bash
+./create-pv-mounts.sh
+```
+
+### Configure port forwarding to your local machine 
 1. Reserve a static IP for your local machine via your router's admin page
 1. Enable TCP port-forwarding for the static IP on ports: 80, 443, 8081 via your router's admin page. (Note your router admin might look different than the screenshot below) 
 
@@ -77,13 +85,8 @@ These instructions are also applicable with a public cloud provider VM having th
     ```
     ![Excluded Ports](images/excluded-ports.png)
 
-## Executing the script
+## Execute the script
 **Complete all prerequisites before proceeding with these steps**
-1. Clone the repository to a local directory
-
-    ```bash
-    git clone <final-repo-url> <desired directory path>
-    ```
 
 1. Open the [ddk8s.azcli]([ddk8s.azcli](scripts/ddk8s.azcli)) script
 1. Open a WSL2 terminal
@@ -96,11 +99,13 @@ These instructions are also applicable with a public cloud provider VM having th
 
 The following arguments are available in the deploy-arc-ddk8s script.
 ![Deploy Ddk8s Help](images/ddk8s-help-options.png)
-
-## Microsoft documentation references
+## Microsoft documentation
 - [Connect an existing Kubernetes cluster to Azure Arc](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli)
 - [Set up an Azure Arc Kubernetes cluster to run App Services](https://docs.microsoft.com/en-us/azure/app-service/manage-create-arc-environment)
 - [App Service on Azure Arc (Preview)](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration)
+- [Azure Arc Data Controller - Direct Connectivity](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-data-controller-direct-cli)
+- [Arc Data Services Overview](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview)
+- [Arc Data Services Storage Configuration](https://docs.microsoft.com/en-us/azure/azure-arc/data/storage-configuration)
 
 
 ## Troubleshooting
@@ -115,5 +120,5 @@ Ensure your port forwarding or network security group allows inbound and outboun
 ### App Service extension build service pods are stuck in pending
 A persistent volume is not created during app service extension helm chart install. 
 The script will create it for you based on the yml file in scripts/appservice-extensions/pv.yml.
-Ensure the persistent volume is created and the path /mnt/persistent-volume exists.
+Ensure the persistent volume is created.
 Ensure the persistent volume claim is created.
