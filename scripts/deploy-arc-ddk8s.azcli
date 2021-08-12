@@ -521,15 +521,15 @@ function print_usage(){
     HELP_FLAG=true
     echo '''Usage: ./deploy-arc-ddk8s.azcli [arguments]
 Arguments
-  --location -l       [Required]       : The azure region to deploy all resources.
-                                         Valid values: eastus, westeurope.
-  --cluster-name -n   [Required]       : The name to describe the host machine running the Docker Desktop cluster.
-  --create-arc-data   [In Development] : Create arc data services in addition to appservice.
-                                         This argument is still in development.
-  --spn-id                             : Service principal client id.
-  --spn-secret                         : Service principal client secret.
-  --sql-username                       : Sql admin username.
-  --sql-password                       : Sql admin password.
+  --location -l       [Required] : The azure region to deploy all resources.
+                                   Valid values: eastus, westeurope.
+  --cluster-name -n   [Required] : The name to describe the host machine running the Docker Desktop cluster.
+  --create-arc-data              : Create arc data services in addition to appservice.
+                                   Only use this argument if WSL2 has sufficient memory and processors.
+  --spn-id                       : Service principal client id.
+  --spn-secret                   : Service principal client secret.
+  --sql-username                 : Sql admin username.
+  --sql-password                 : Sql admin password.
 
 Examples
     Create an Azure WebApp on Arc-connected local Docker Desktop K8s clusterregistered to eastus region.
