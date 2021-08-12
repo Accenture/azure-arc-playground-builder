@@ -12,6 +12,12 @@ These instructions are also applicable with a public cloud provider VM having th
 ## Prerequisites
 ### Machine setup and WSL2 install on Windows
 - [Set up your Workstation](prerequisites.md)
+- If deploying arc data services this is the recommended resources WSL2 config. Anything less will likely be insufficient to run both Arc Data Services + Arc App Service
+```
+[wsl2]
+memory=16GB # Limits VM memory in WSL 2 to 16 GB
+processors=4 # Makes the WSL 4 VM use two virtual processors
+```
 - Ensure azure-cli version 2.26.0 or 2.26.1 are not installed (see Known Issues)
 
     ```bash
