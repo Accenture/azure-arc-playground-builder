@@ -886,7 +886,7 @@ function print_usage(){
     HELP_FLAG=true
     echo '''
 Usage
-    ./deploy-arc-aks.azcli [arguments] : Creates an Arc connected AKS cluster(s).
+    ./deploy-arc-aks.sh [arguments] : Creates an Arc connected AKS cluster(s).
                                          Creates Arc App Service.
                                          Creates Arc Sql (PostgreSQL or SQL Managed Instance).
                                          Deploys Hello World to Arc App Service.
@@ -917,7 +917,7 @@ Arguments
 
 Examples
     Create an Azure WebApp & Arc Postgres Hyperscale on Arc-connected AKS cluster registered to eastus region
-    ./deploy-arc-aks.azcli --location eastus \
+    ./deploy-arc-aks.sh --location eastus \
         --custom-location-name demo-site-virginia \
         --spn-id $SERVICE_PRINCIPAL_ID \
         --spn-secret $SERVICE_PRINCIPAL_SECRET \
@@ -929,7 +929,7 @@ Examples
     CUSTOM_LOCATION_NAMES=( "demo-site-virgina" "demo-site-netherlands" )
     LOCATIONS=( "eastus" "westeurope" )
 
-    ./deploy-arc-aks.azcli \
+    ./deploy-arc-aks.sh \
         --spn-id $SERVICE_PRINCIPAL_ID \
         --spn-secret $SERVICE_PRINCIPAL_SECRET \
         --sql-username demoadmin \
@@ -991,7 +991,7 @@ function check_inputs(){
 }
 
 # BEGIN EXECUTION
-PARSED_OPTIONS=$(getopt -a -n deploy-arc-aks.azcli -o l:hn: --long location:,help,custom-location-name:,arc-sql-db-type:,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
+PARSED_OPTIONS=$(getopt -a -n deploy-arc-aks.sh -o l:hn: --long location:,help,custom-location-name:,arc-sql-db-type:,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
 
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then

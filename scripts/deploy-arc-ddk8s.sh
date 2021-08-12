@@ -519,7 +519,7 @@ function create_arc_data_service() {
 ##############################################################
 function print_usage(){
     HELP_FLAG=true
-    echo '''Usage: ./deploy-arc-ddk8s.azcli [arguments]
+    echo '''Usage: ./deploy-arc-ddk8s.sh [arguments]
 Arguments
   --location -l       [Required] : The azure region to deploy all resources.
                                    Valid values: eastus, westeurope.
@@ -533,16 +533,23 @@ Arguments
 
 Examples
     Create an Azure WebApp on Arc-connected local Docker Desktop K8s clusterregistered to eastus region.
-    ./deploy-arc-ddk8s.azcli -l eastus --cluster-name my-laptop
+    ./deploy-arc-ddk8s.sh -l eastus --cluster-name my-laptop
 
     Create an Azure WebApp & Arc Postgres Hyperscale on Arc-connected local Docker Desktop K8s cluster registered to eastus region
-    ./deploy-arc-ddk8s.azcli -l eastus --cluster-name my-laptop --create-arc-data --spn-id $SERVICE_PRINCIPAL_ID --spn-secret $SERVICE_PRINCIPAL_SECRET --sql-username demoadmin --sql-password $SQL_PASSWORD
+    ./deploy-arc-ddk8s.sh \
+    -l eastus \
+    --cluster-name my-laptop \
+    --create-arc-data \
+    --spn-id $SERVICE_PRINCIPAL_ID \
+    --spn-secret $SERVICE_PRINCIPAL_SECRET \
+    --sql-username demoadmin \
+    --sql-password $SQL_PASSWORD
 '''
 }
 
 
 # BEGIN EXECUTION
-PARSED_OPTIONS=$(getopt -a -n deploy-arc-ddk8s.azcli -o l:hn: --long location:,help,cluster-name:,create-arc-data,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
+PARSED_OPTIONS=$(getopt -a -n deploy-arc-ddk8s.sh -o l:hn: --long location:,help,cluster-name:,create-arc-data,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
 
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then

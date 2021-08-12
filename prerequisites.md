@@ -8,7 +8,7 @@
 
 ### WSL2 tooling setup
 
-Run these commands in your WSL2 Linux terminal. This script below assumes you're using Windows 10 or Windows 11, with WSL2, and using Ubuntu 20.04, which is the default verison when picking Ubuntu from the Microsoft Store.
+Run these commands in your WSL2 Linux terminal. This script below assumes you're using Windows 10 or Windows 11, with WSL2, and using Ubuntu 20.04, which is the default version when picking Ubuntu from the Microsoft Store.
 
 ```bash
 # Disable WSL2 login message and update packages
@@ -81,7 +81,7 @@ sudo apt-get install -y azdata-cli
   - [Visual Studio IntelliCode](https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode)
   - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-## Azure Service Prinicpal setup
+## Azure Service Principal setup
 * Azure Arc Data services require a service principal to publish usage and metric data to Azure
 * It is recommended to scope the service principal to a specific Azure subscription.
 ```bash

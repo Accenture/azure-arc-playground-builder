@@ -1,10 +1,10 @@
-# Deploy Azure App Service on Azure Arc Connected AKS with Arc SQL Managed Intance
+# Deploy Azure App Service on Azure Arc Connected AKS with Arc SQL Managed Instance
 
-The [deploy-arc-aks.azcli](scripts/deploy-arc-aks.azcli) script will deploy a Hello World webapp on Azure App Service and an Arc SQL Managed Instance database backend, all on top of an Azure Arc connected AKS cluster. Deploying Arc PostgreSQL Hyperscale is also supported through the --arc-sql-db-type argument.
+The [deploy-arc-aks.sh](scripts/deploy-arc-aks.sh) script will deploy a Hello World webapp on Azure App Service and an Arc SQL Managed Instance database backend, all on top of an Azure Arc connected AKS cluster. Deploying Arc PostgreSQL Hyperscale is also supported through the --arc-sql-db-type argument.
 
 ## Prerequisites
 
-1. [Set up your Workstation](prerequisites.md)
+1. [Set up Workstation](prerequisites.md)
 1. Ensure latest azure-cli version is installed
 
     ```bash
@@ -23,7 +23,7 @@ The [deploy-arc-aks.azcli](scripts/deploy-arc-aks.azcli) script will deploy a He
     SERVICE_PRINCIPAL_ID='<spn id>'
     SERVICE_PRINCIPAL_SECRET='<spn secret>'
     SQL_PASSWORD='<sql admin password>'
-    ./deploy-arc-aks.azcli --location eastus \
+    ./deploy-arc-aks.sh --location eastus \
         --custom-location-name my-site-virginia \
         --spn-id $SERVICE_PRINCIPAL_ID \
         --spn-secret $SERVICE_PRINCIPAL_SECRET \
@@ -33,7 +33,8 @@ The [deploy-arc-aks.azcli](scripts/deploy-arc-aks.azcli) script will deploy a He
     ```
 1. Browse to the hello world webapp
 
-The deploy-arc-aks.azcli script receives the following arguments:
+The [deploy-arc-aks.sh](scripts/deploy-arc-aks.sh) script receives the following arguments:
+
 ![Aks Options](images/aks-help.png)
 
 ## Microsoft Documentation References

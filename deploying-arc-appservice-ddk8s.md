@@ -1,5 +1,5 @@
 # Deploy Azure App Service on Azure Arc Docker Desktop Single Node Kubernetes
-This document describes how to run the [deploy-arc-ddk8s.azcli](scripts/deploy-arc-ddk8s.azcli) script to accomplish: 
+This document describes how to run the [deploy-arc-ddk8s.sh](scripts/deploy-arc-ddk8s.sh) script to accomplish: 
 - Connect a local Docker Desktop single-node Kubernetes cluster to Azure Arc
 - Install Azure App Service Extensions (Preview)
 - Deploy a Hello World web app to the Azure App Service running in a local K8s cluster on Docker Desktop.
@@ -11,7 +11,7 @@ These instructions are also applicable with a public cloud provider VM having th
 
 ## Prerequisites
 ### Machine setup and WSL2 install on Windows
-- [Set up your Workstation](prerequisites.md)
+- [Set up Workstation](prerequisites.md)
 - If deploying Arc data services, this is the recommended resources WSL2 config. Smaller configurations might be insufficient to run both Arc Data Services + Arc App Service
     ```
     [wsl2]
@@ -27,7 +27,7 @@ These instructions are also applicable with a public cloud provider VM having th
     az upgrade
     ```
 
-- Install the latest version of [yq](https://mikefarah.gitbook.io/yq/#install) on your WSL2 terminal
+- Install the latest version of [yq](https://mikefarah.gitbook.io/yq/#install) on the WSL2 terminal
 
     ```bash
     # yq is only required by this script, not required when targeting an AKS cluster
@@ -37,12 +37,12 @@ These instructions are also applicable with a public cloud provider VM having th
     sudo apt install yq -y
     ```
 
-- Login to your Azure Subscription using the azure-cli on your WSL2 terminal: 
+- Login to the Azure Subscription using the azure-cli on the WSL2 terminal: 
 
     ```bash
     az login
     ```
-- [Optional] If your account has multiple subscriptions, set the desired subscription by running:
+- [Optional] If the Azure account has multiple subscriptions, set the desired subscription by running:
 
     ```bash
     az account set -s <subscription-name-or-guid>
@@ -65,17 +65,17 @@ Execute the script to create directories & mountpoints in the WSL2 terminal.
 ./create-pv-mounts.sh
 ```
 
-### Configure port forwarding to your local machine 
-1. Reserve a static IP for your local machine via your router's admin page
-1. Enable TCP port-forwarding for the static IP on ports: 80, 443, 8081 via your router's admin page. (Note your router admin might look different than the screenshot below) 
+### Configure port forwarding to local machine 
+1. Reserve a static IP for the local machine via the router's admin page
+1. Enable TCP port-forwarding for the static IP on ports: 80, 443, 8081 via the router's admin page. (Note router admin might look different than the screenshot below) 
 
     ![Router Admin](images/staticip-portforwarding-eero-sm.jpg)
-1. Connect your local machine to your local network using the static IP
+1. Connect local machine to local network using the static IP
 
     ![Static IP](images/static-ip-localhost.png)
 
 1. Add inbound and outbound OS firewall rules for ports 80, 443, 8081
-1. Ensure none of the ports (80,443,8081) are reserved on your OS. For Windows - via CMD with Administrative Privileges
+1. Ensure none of the ports (80,443,8081) are reserved on the OS. For Windows - via CMD with Administrative Privileges
     ```bat
     # show the list of reserved ports 
     netsh int ip show excludedportrange protocol=tcp
@@ -88,17 +88,18 @@ Execute the script to create directories & mountpoints in the WSL2 terminal.
 ## Execute the script
 **Complete all prerequisites before proceeding with these steps**
 
-1. Open the [ddk8s.azcli]([ddk8s.azcli](scripts/ddk8s.azcli)) script
 1. Open a WSL2 terminal
 1. Ensure you are logged in the azure-cli
 1. Change directory to the 'scripts' folder where you cloned the repository
 1. Execute the script with required arguments
     ```bash
-    ./deploy-arc-ddk8s.azcli -l eastus --cluster-name my-laptop
+    ./deploy-arc-ddk8s.sh -l eastus --cluster-name my-laptop
     ```
 
 The following arguments are available in the deploy-arc-ddk8s script.
+
 ![Deploy Ddk8s Help](images/ddk8s-help-options.png)
+
 ## Microsoft documentation
 - [Connect an existing Kubernetes cluster to Azure Arc](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli)
 - [Set up an Azure Arc Kubernetes cluster to run App Services](https://docs.microsoft.com/en-us/azure/app-service/manage-create-arc-environment)
@@ -112,7 +113,7 @@ The following arguments are available in the deploy-arc-ddk8s script.
 ### Kubernetes services external IP does not include localhost
 Each time before running the Docker Desktop script, ensure to reset the Kubernetes cluster and stop and start (not restart) Docker Desktop. Failure to quit and start Docker Desktop so will cause the envoy Kubernetes service to not receive localhost ip assignment as an ExternalIP. Underlying issue is described [here](https://github.com/docker/for-mac/issues/4903)
 ### Unable to deploy or connect to Azure App Service
-Ensure your port forwarding or network security group allows inbound and outbound traffic on 443, 80, and 8081.
+Ensure port forwarding or network security group allows inbound and outbound traffic on 443, 80, and 8081.
 ### App Service extension build service pods are stuck in pending
 A persistent volume is not created during app service extension helm chart install. 
 The script will create it for you based on the yml file in scripts/appservice-extensions/pv.yml.
