@@ -51,12 +51,11 @@ These instructions are also applicable with a public cloud provider VM having th
 - Stop and Start Docker Desktop (do not restart, see Known Issues)
 
     ![Stop and Start Docker Desktop](images/stop-docker.png)
-- Create the directory used as a Kubernetes persistent Volume
-    ```bash
-    sudo mkdir /mnt/persistent-volume
-    sudo chmod -R u=rwx,g=rw,o=rw /mnt/persistent-volume
-    ```
 
+- Create the directories & mountpoints in the WSL2 terminal. The mountpoints are used in local-storage Kubernetes persistent volumes. This step is only required if creating data services. See [create-pv-mounts.sh](scripts/create-pv-mounts.sh) for more details. See this [thread](https://github.com/docker/for-win/issues/5325#issuecomment-567594291) for WSL2 Docker Desktop mountpoint details.
+    ```bash
+    ./create-pv-mounts.sh
+    ```
 ### Setup port forwarding to your local machine 
 1. Reserve a static IP for your local machine via your router's admin page
 1. Enable TCP port-forwarding for the static IP on ports: 80, 443, 8081 via your router's admin page. (Note your router admin might look different than the screenshot below) 
