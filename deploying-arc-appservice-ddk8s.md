@@ -16,7 +16,7 @@ These instructions are also applicable with a public cloud provider VM having th
     ```
     [wsl2]
     memory=16GB # Limits VM memory in WSL 2 to 16 GB
-    processors=4 # Makes the WSL 4 VM use two virtual processors
+    processors=4 # Makes the WSL 2 VM use 4 virtual processors
     ```
 - Ensure azure-cli version 2.26.0 or 2.26.1 are not installed (see Known Issues)
 
