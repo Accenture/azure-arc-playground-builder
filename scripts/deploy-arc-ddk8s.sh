@@ -2,13 +2,6 @@
 
 # Connect Existing Docker Desktop Single Node K8s to Azure Arc and Deploy Hello World on Local App Service
 
-# Prerequisites
-# setup your workstation - https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine
-# install latest version of helm - https://helm.sh/docs/intro/install/
-# install yq - https://mikefarah.gitbook.io/yq/#install
-# login to azure cli 'az login'
-# if account has multiple subscriptions, run 'az account -s <subscription-name-or-guid>'
-
 # FLAGS
 # Alter these values to control how resources are deployed
 LOCAL_HOST_NAME='' 
@@ -519,7 +512,7 @@ function create_arc_data_service() {
 ##############################################################
 function print_usage(){
     HELP_FLAG=true
-    echo '''Usage: ./deploy-arc-ddk8s.azcli [arguments]
+    echo '''Usage: ./deploy-arc-ddk8s.sh [arguments]
 Arguments
   --location -l       [Required] : The azure region to deploy all resources.
                                    Valid values: eastus, westeurope.
@@ -533,16 +526,23 @@ Arguments
 
 Examples
     Create an Azure WebApp on Arc-connected local Docker Desktop K8s clusterregistered to eastus region.
-    ./deploy-arc-ddk8s.azcli -l eastus --cluster-name my-laptop
+    ./deploy-arc-ddk8s.sh -l eastus --cluster-name my-laptop
 
     Create an Azure WebApp & Arc Postgres Hyperscale on Arc-connected local Docker Desktop K8s cluster registered to eastus region
-    ./deploy-arc-ddk8s.azcli -l eastus --cluster-name my-laptop --create-arc-data --spn-id $SERVICE_PRINCIPAL_ID --spn-secret $SERVICE_PRINCIPAL_SECRET --sql-username demoadmin --sql-password $SQL_PASSWORD
+    ./deploy-arc-ddk8s.sh \
+    -l eastus \
+    --cluster-name my-laptop \
+    --create-arc-data \
+    --spn-id $SERVICE_PRINCIPAL_ID \
+    --spn-secret $SERVICE_PRINCIPAL_SECRET \
+    --sql-username demoadmin \
+    --sql-password $SQL_PASSWORD
 '''
 }
 
 
 # BEGIN EXECUTION
-PARSED_OPTIONS=$(getopt -a -n deploy-arc-ddk8s.azcli -o l:hn: --long location:,help,cluster-name:,create-arc-data,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
+PARSED_OPTIONS=$(getopt -a -n deploy-arc-ddk8s.sh -o l:hn: --long location:,help,cluster-name:,create-arc-data,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
 
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
