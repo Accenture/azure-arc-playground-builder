@@ -130,22 +130,23 @@ function check_prereqs() {
     if ! kubectx &>/dev/null; then
         echo ""
         is_error=true
-        echo 'Error: kubectx is not installed. Please ensure kubectx is installed https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine' >&2
+        echo 'Error: kubectx is not installed. Please ensure kubectx is installed.' >&2
     fi
 
     if ! kubectl &>/dev/null; then
         echo ""
         is_error=true
-        echo 'Error: kubectl is not installed. Please ensure kubectl is installed https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine' >&2
+        echo 'Error: kubectl is not installed. Please ensure kubectl is installed.' >&2
     fi
 
     if ! docker &>/dev/null; then
         echo ""
         is_error=true
-        echo 'Error: docker could not be found. Please ensure docker-desktop is installed https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine' >&2
+        echo 'Error: docker could not be found. Please ensure docker-desktop is installed.' >&2
     fi
 
     if [[ "${is_error}" == "true" ]]; then
+        echo 'Please see prequisites for more informaion: https://github.com/Accenture/azure-arc-playground-builder/blob/main/prerequisites.md#setup-a-wsl2-based-azure-developer-machine' >&2
         exit 1
     fi
 
