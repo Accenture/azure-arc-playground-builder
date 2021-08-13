@@ -8,6 +8,7 @@ LOCAL_HOST_NAME=''
 REGION=''
 CREATE_ARC_DATA_SERVICES=false
 HELP_FLAG=false
+KUBECTX_FLAG='docker-desktop'
 
 # These must be provided if choosing to deploy arc data services
 PGSQL_ADMIN_PW='' # must be 8-128 characters long. Cannot contain 'citus'. Your password must contain characters from three of the following categories – English uppercase letters, English lowercase letters, numbers (0-9), and non-alphanumeric characters (!, $, #, %, etc.).
@@ -518,6 +519,9 @@ Arguments
   --spn-secret                   : Service principal client secret.
   --sql-username                 : Sql admin username.
   --sql-password                 : Sql admin password.
+  --kubectx -k        [Optional] : Name of existing kubernetes context to use.
+                                   Default value is docker-desktop
+  --help -h                      : Print the script usage message.
 
 Examples
     Create an Azure WebApp on Arc-connected local Docker Desktop K8s clusterregistered to eastus region.
@@ -537,7 +541,7 @@ Examples
 
 
 # BEGIN EXECUTION
-PARSED_OPTIONS=$(getopt -a -n deploy-arc-ddk8s.sh -o l:hn: --long location:,help,cluster-name:,create-arc-data,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
+PARSED_OPTIONS=$(getopt -a -n deploy-arc-ddk8s.sh -o l:hn:k: --long location:,help,cluster-name:,kubectx:,create-arc-data,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
 
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -551,6 +555,7 @@ case "$1" in
     -l | --location)        REGION="$2" ; shift 2 ;;
     -n | --cluster-name)    LOCAL_HOST_NAME="$2" ; shift 2 ;;
     -h | --help)            print_usage  ; shift   ;;
+    -k | --kubectx)         KUBECTX_FLAG="$2" ; shift 2 ;;
     --create-arc-data)      CREATE_ARC_DATA_SERVICES=true  ; shift   ;;
     --spn-id)               SP_CLIENT_ID="$2"  ; shift 2  ;;
     --spn-secret)           SP_SECRET="$2"  ; shift 2 ;;
@@ -626,9 +631,9 @@ echo "Creating Log Analytics Workspace...done."
 log_resource_id $workspace_resource_id
 
 # Create Arc-Enabled K8s CLuster
-echo -n "Switching kubectx to docker-desktop..."
-if ! kubectx docker-desktop >/dev/null; then
-    echo 'Error: failed to set kubectl context to "docker-desktop". Please check docker desktop is installed correctly.' >&2
+echo -n "Switching kubectx to ${KUBECTX_FLAG}..."
+if ! kubectx ${KUBECTX_FLAG} >/dev/null; then
+    echo "Error: failed to set kubectl context to ${KUBECTX_FLAG}. Please check docker desktop is installed correctly." >&2
     exit 1
 fi
 echo 'done.'
