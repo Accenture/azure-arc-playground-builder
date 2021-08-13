@@ -12,7 +12,9 @@ These instructions are also applicable with a public cloud provider VM having th
 ## Prerequisites
 ### Machine setup and WSL2 install on Windows
 - [Set up Workstation](prerequisites.md)
-- If deploying Arc data services, this is the recommended resources WSL2 config. Smaller configurations might be insufficient to run both Arc Data Services + Arc App Service
+- If deploying Arc data services, this is the recommended resources WSL2 config. 
+Smaller configurations might be insufficient to run both Arc Data Services + Arc App Service.
+See [WSL config](https://docs.microsoft.com/en-us/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more information.
     ```
     [wsl2]
     memory=16GB # Limits VM memory in WSL 2 to 16 GB
@@ -37,7 +39,7 @@ These instructions are also applicable with a public cloud provider VM having th
     sudo apt install yq -y
     ```
 
-- Login to the Azure Subscription using the azure-cli on the WSL2 terminal: 
+- Login to the Azure subscription using the azure-cli on the WSL2 terminal: 
 
     ```bash
     az login
@@ -45,6 +47,7 @@ These instructions are also applicable with a public cloud provider VM having th
 - [Optional] If the Azure account has multiple subscriptions, set the desired subscription by running:
 
     ```bash
+    az account list -o table
     az account set -s <subscription-name-or-guid>
     ```
 

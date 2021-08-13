@@ -130,22 +130,23 @@ function check_prereqs() {
     if ! kubectx &>/dev/null; then
         echo ""
         is_error=true
-        echo 'Error: kubectx is not installed. Please ensure kubectx is installed https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine' >&2
+        echo 'Error: kubectx is not installed. Please ensure kubectx is installed.' >&2
     fi
 
     if ! kubectl &>/dev/null; then
         echo ""
         is_error=true
-        echo 'Error: kubectl is not installed. Please ensure kubectl is installed https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine' >&2
+        echo 'Error: kubectl is not installed. Please ensure kubectl is installed.' >&2
     fi
 
     if ! docker &>/dev/null; then
         echo ""
         is_error=true
-        echo 'Error: docker could not be found. Please ensure docker-desktop is installed https://azureintheenterprise.com/articles/setup-wsl-azure-developer-machine' >&2
+        echo 'Error: docker could not be found. Please ensure docker-desktop is installed.' >&2
     fi
 
     if [[ "${is_error}" == "true" ]]; then
+        echo 'Please see prequisites for more informaion: https://github.com/Accenture/azure-arc-playground-builder/blob/main/prerequisites.md#setup-a-wsl2-based-azure-developer-machine' >&2
         exit 1
     fi
 
@@ -325,7 +326,7 @@ function create_local_storage_provisioner(){
 ##############################################################
 function create_arc_data_service() {
     local rg=${RESOURCE_GROUP}
-    local custom_location_name=${CUSTOM_LOCATION_NAME}
+    local custom_location_name=${LOCAL_HOST_NAME}
     local rand=${RAND}
     local region=${REGION}
     
@@ -342,12 +343,6 @@ function create_arc_data_service() {
     local pgsql_ip=''
     local pgsql_primary_endpoint=''
     local pgsql_id=''
-
-    # Local storage provisioning.
-    # kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
-
-    # Set local-storage as the default storage class
-    # kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
     # deploy the arc data k8s extension
     echo -n "Installing Arc Data Services extension in namespace: ${ARC_DATA_NAMESPACE}..."
