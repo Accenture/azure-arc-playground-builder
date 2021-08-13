@@ -12,7 +12,9 @@ These instructions are also applicable with a public cloud provider VM having th
 ## Prerequisites
 ### Machine setup and WSL2 install on Windows
 - [Set up Workstation](prerequisites.md)
-- If deploying Arc data services, this is the recommended resources WSL2 config. Smaller configurations might be insufficient to run both Arc Data Services + Arc App Service
+- If deploying Arc data services, this is the recommended resources WSL2 config. 
+Smaller configurations might be insufficient to run both Arc Data Services + Arc App Service.
+See [WSL config](https://docs.microsoft.com/en-us/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more information.
     ```
     [wsl2]
     memory=16GB # Limits VM memory in WSL 2 to 16 GB
