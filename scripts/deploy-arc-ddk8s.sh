@@ -326,7 +326,7 @@ function create_local_storage_provisioner(){
 ##############################################################
 function create_arc_data_service() {
     local rg=${RESOURCE_GROUP}
-    local custom_location_name=${CUSTOM_LOCATION_NAME}
+    local custom_location_name=${LOCAL_HOST_NAME}
     local rand=${RAND}
     local region=${REGION}
     
@@ -343,12 +343,6 @@ function create_arc_data_service() {
     local pgsql_ip=''
     local pgsql_primary_endpoint=''
     local pgsql_id=''
-
-    # Local storage provisioning.
-    # kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
-
-    # Set local-storage as the default storage class
-    # kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
     # deploy the arc data k8s extension
     echo -n "Installing Arc Data Services extension in namespace: ${ARC_DATA_NAMESPACE}..."
