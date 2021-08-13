@@ -904,6 +904,7 @@ Arguments
                                                – English uppercase letters
                                                - English lowercase letters, numbers (0-9)
                                                - Non-alphanumeric characters (!, $, #, %, etc.).
+  --help -h                              : Print the script usage message.
 
 Examples
     Create an Azure WebApp & Arc Postgres Hyperscale on Arc-connected AKS cluster registered to eastus region
