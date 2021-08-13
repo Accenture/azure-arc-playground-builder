@@ -13,6 +13,17 @@ The [deploy-arc-aks.sh](scripts/deploy-arc-aks.sh) script will deploy a Hello Wo
     # upgrade to at least 2.27.* if needed
     az upgrade
     ```
+1. Login to the Azure subscription using the azure-cli on the WSL2 terminal: 
+
+    ```bash
+    az login
+    ```
+1. [Optional] If the Azure account has multiple subscriptions, set the desired subscription by running:
+
+    ```bash
+    az account list -o table
+    az account set -s <subscription-name-or-guid>
+    ```
 ## Executing the script
 1. Clone the repository to a local directory
 1. Open a WSL2 terminal
