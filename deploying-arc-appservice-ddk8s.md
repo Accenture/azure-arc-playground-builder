@@ -37,7 +37,7 @@ These instructions are also applicable with a public cloud provider VM having th
     sudo apt install yq -y
     ```
 
-- Login to the Azure Subscription using the azure-cli on the WSL2 terminal: 
+- Login to the Azure subscription using the azure-cli on the WSL2 terminal: 
 
     ```bash
     az login
@@ -45,6 +45,7 @@ These instructions are also applicable with a public cloud provider VM having th
 - [Optional] If the Azure account has multiple subscriptions, set the desired subscription by running:
 
     ```bash
+    az account list -o table
     az account set -s <subscription-name-or-guid>
     ```
 
