@@ -55,6 +55,32 @@ declare -A CONN_STRINGS                    # Key: resourceGroupName, Value: #con
 
 # FUNCTION DECLARATIONS
 ####################################################################
+# Prints to terminal with standard format
+# Globals:
+#   None
+# Arguments:
+#   None
+####################################################################
+function echo_log(){
+    local str=$1
+    local date_str=$(date +"%Y-%m-%dT%T")
+    echo "${date_str} | ${str}"
+}
+
+####################################################################
+# Prints to terminal without new line with standard format
+# Globals:
+#   None
+# Arguments:
+#   None
+####################################################################
+function echo_n_log(){
+    local str=$1
+    local date_str=$(date +"%Y-%m-%dT%T")
+    echo -n "${date_str}  ${str}"
+}
+
+####################################################################
 # Ensure dependencies are installed.
 # Globals:
 #   SUBSCRIPTION_ID
@@ -62,7 +88,7 @@ declare -A CONN_STRINGS                    # Key: resourceGroupName, Value: #con
 #   None
 ####################################################################
 function check_prereqs() {
-    echo -n 'Checking prerequisites are installed...'
+    echo_n_log 'Checking prerequisites are installed...'
 
     local is_error=false
     local az_version=""
@@ -162,14 +188,14 @@ function echo_flags() {
     local region=''
     local num=0
 
-    echo '#################### PARAMETERS ####################'
+    echo '################################# PARAMETERS ####################################'
 
     for ((i = 0; i < ${#CUSTOM_LOCATION_NAMES[@]}; i++)); do
         location_name="${CUSTOM_LOCATION_NAMES[$i]}"
         region="${LOCATIONS[$i]}"
         num=$((i + 1))
 
-        echo "Custom AKS Location #${num} | Location Name: '${location_name}', Region: '${region}'"
+        echo "Custom AKS Location #${num} | Location Name: '${location_name}', Region: ${region}, Db Type: ${ARC_SQL_DB_TYPE_FLAG}"
     done
 
     echo '#################################################################################'
@@ -183,7 +209,7 @@ function echo_flags() {
 #   None
 ####################################################################
 function install_azure_cli_extensions() {
-    echo -n 'Installing Azure CLI extensions...'
+    echo_n_log 'Installing Azure CLI extensions...'
 
     if ! az extension add --upgrade --yes -n connectedk8s -o none --only-show-errors &>/dev/null; then
         echo 'Error: failed to install connectedk8s azure-cli extension' >&2
@@ -220,7 +246,7 @@ function install_azure_cli_extensions() {
     fi
     echo 'done.'
 
-    echo -n 'Registering Providers...'
+    echo_n_log 'Registering Providers...'
     if ! az provider register --namespace Microsoft.ExtendedLocation --wait -o none --only-show-errors &>/dev/null; then
         echo 'Error failed to register Microsoft.ExtendedLocation' >&2
         exit 1
@@ -275,7 +301,7 @@ function log_resource_id() {
     local resource_id=$1
 
     if [[ "${LOG_RESOURCES}"=="true" ]]; then
-        echo "${resource_id}"
+        echo_log "${resource_id}"
     fi
 }
 
@@ -304,7 +330,7 @@ function create_rg() {
     local region=$2
     local rg_id=''
 
-    echo -n "Creating Azure Resource Group ${rg} in ${region} region..."
+    echo_n_log "Creating Azure Resource Group ${rg} in ${region} region..."
 
     if ! rg_id=$(az group create -n $rg --location $region -o tsv --query id --only-show-errors) >/dev/null; then
         echo "Error: failed to create resource group ${rg}." >&2
@@ -331,7 +357,7 @@ function create_log_analytics_workspace() {
     local name="${rg}-workspace"
     local workspace_resource_id=''
 
-    echo -n "Creating Log Analytics Workspace..."
+    echo_n_log "Creating Log Analytics Workspace..."
 
     if ! workspace_resource_id=$(az monitor log-analytics workspace create -g $rg --workspace-name $name -o tsv --query id --only-show-errors) >/dev/null; then
         echo
@@ -349,7 +375,7 @@ function create_log_analytics_workspace() {
     LOG_ANALYTICS_KEYS[$rg]="${key}"
     LOG_ANALYTICS_KEYS_ENC[$rg]=$(echo -n "${key_enc_with_space//[[:space:]]/}")
 
-    echo "Creating Log Analytics Workspace...done."
+    echo_log "Creating Log Analytics Workspace...done."
 
     log_resource_id $workspace_resource_id
 }
@@ -386,7 +412,7 @@ function create_sql_mi(){
     local sqlmi_id=''
 
     # Create arc sql server managed isntance
-    echo -n 'Deploying Arc SQL Managed Instance in direct mode (this may take a few minutes)...'
+    echo_n_log 'Deploying Arc SQL Managed Instance in direct mode (this may take a few minutes)...'
     az group deployment create \
         -n $sqlmi_deployment \
         -g $rg \
@@ -405,9 +431,9 @@ function create_sql_mi(){
         resourceGroup="${rg}" \
         resourceName="${sqlmi_server_name}"
 
-    echo 'Deploying Arc SQL Managed Instance in direct mode (this may take a few minutes)...done.'
+    echo_log 'Deploying Arc SQL Managed Instance in direct mode (this may take a few minutes)...done.'
 
-    echo -n 'Waiting for SQL Managed Instance to be in ready state...'
+    echo_n_log 'Waiting for SQL Managed Instance to be in ready state...'
 
     sqlmi_id=$(az resource show -o tsv -g $rg -n $sqlmi_server_name --resource-type microsoft.azurearcdata/sqlmanagedinstances --api-version 2021-07-01-preview --query id --only-show-errors) >/dev/null
 
@@ -415,7 +441,7 @@ function create_sql_mi(){
         echo_reset_err 'Error: failed to wait for sql managed instance to finish creating on AKS cluster'
         exit 1
     fi
-    echo 'Waiting for SQL Managed Instance to be in ready state...done.'
+    echo_log'Waiting for SQL Managed Instance to be in ready state...done.'
 
     sqlmi_primary_endpoint=$(az resource show -o tsv -g $rg -n $sqlmi_server_name --resource-type microsoft.azurearcdata/sqlmanagedinstances --query properties.k8sRaw.status.primaryEndpoint --only-show-errors --api-version 2021-07-01-preview) >/dev/null
 
@@ -424,7 +450,7 @@ function create_sql_mi(){
         exit 1
     fi
     log_resource_id ${sqlmi_id}
-    echo "SQL Managed Instance External Endpoint: ${sqlmi_primary_endpoint}"
+    echo_log "SQL Managed Instance External Endpoint: ${sqlmi_primary_endpoint}"
 
     # set the SQL MI connection string using K8s DNS, <service>.<namespace>
     CONN_STRINGS[$rg]="Data Source=${sqlmi_server_name}-external-svc.${ARC_DATA_NAMESPACE};Database=Todo;User Id=${AZDATA_USERNAME};Password=${AZDATA_PASSWORD};Encrypt=true;TrustServerCertificate=true"
@@ -464,7 +490,7 @@ function create_pgsql(){
     local pgsql_id=''
 
     # Create postgresql hyperscale server 
-    echo -n 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...'
+    echo_n_log 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...'
     az group deployment create \
         -n $pgsql_deployment \
         -g $rg \
@@ -485,12 +511,12 @@ function create_pgsql(){
     
     pgsql_id=$(az resource show -o tsv -g $rg -n $pgsql_server_name --resource-type microsoft.azurearcdata/postgresinstances --query id --only-show-errors) >/dev/null
 
-    echo -n 'Waiting for PostgreSQL to be in ready state...'
+    echo_n_log 'Waiting for PostgreSQL to be in ready state...'
     if ! az resource wait -o none --only-show-errors --timeout $MAX_WAIT_SECONDS --ids $pgsql_id --resource-type 'microsoft.azurearcdata/postgresinstances' --custom "properties.k8sRaw.status.state=='Ready'" >/dev/null; then
         echo_reset_err 'Error: failed to wait for hyperscale postgresql server to finish creating on AKS cluster'
         exit 1
     fi
-    echo 'Waiting for PostgreSQL to be in ready state...done.'
+    echo_log 'Waiting for PostgreSQL to be in ready state...done.'
 
     pgsql_primary_endpoint=$(az resource show -o tsv -g $rg -n $pgsql_server_name --resource-type microsoft.azurearcdata/postgresinstances --query properties.k8sRaw.status.primaryEndpoint --only-show-errors) >/dev/null
 
@@ -498,9 +524,9 @@ function create_pgsql(){
         echo_reset_err 'Error: failed to create hyperscale postgresql server on AKS cluster'
         exit 1
     fi
-    echo 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...done'
+    echo_log 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...done'
     log_resource_id ${pgsql_id}
-    echo "PostgreSQL External Endpoint: ${pgsql_primary_endpoint}"
+    echo_log "PostgreSQL External Endpoint: ${pgsql_primary_endpoint}"
     
     # set the PostgreSQL connection string using K8s DNS, <service>.<namespace>
     CONN_STRINGS[$rg]="Host=${pgsql_server_name}-external-svc.${ARC_DATA_NAMESPACE};Port=5432;Database=postgres;Username=postgres;Password=${AZDATA_PASSWORD};SslMode=Disable"
@@ -547,7 +573,7 @@ function create_arc_aks_appservice() {
     local url=''
     local aks_resource_id=''
 
-    echo -n "Creating Azure multitenant AKS cluster in resource group ${rg} (this will take a few minutes)..."
+    echo_n_log "Creating Azure multitenant AKS cluster in resource group ${rg} (this will take a few minutes)..."
 
     if ! aks_resource_id=$(az aks create -g $rg -n $cluster_name -c $AKS_NODE_COUNT -s $AKS_NODE_SIZE --enable-aad --generate-ssh-keys -o tsv --query id --only-show-errors) >/dev/null; then
         echo_reset_err "Error: Failed to create AKS cluster ${cluster_name}"
@@ -559,11 +585,11 @@ function create_arc_aks_appservice() {
         exit 1
     fi
 
-    echo "Creating Azure multitenant AKS cluster in resource group ${rg} (this will take a few minutes)...done."
+    echo_log "Creating Azure multitenant AKS cluster in resource group ${rg} (this will take a few minutes)...done."
 
     log_resource_id ${aks_resource_id}
 
-    echo -n "Creating Azure Public IP Address..."
+    echo_n_log "Creating Azure Public IP Address..."
 
     if ! public_ip_resource_id=$(az network public-ip create -g $infra_rg -n $public_ip_name --sku STANDARD -o json --query publicIp.id --only-show-errors) >/dev/null; then
         echo_reset_err "Error: Failed to create public ip ${public_ip_name}"
@@ -575,11 +601,11 @@ function create_arc_aks_appservice() {
         exit 1
     fi
 
-    echo "${static_ip}...done."
+    echo_log "${static_ip}...done."
 
     log_resource_id $public_ip_resource_id
 
-    echo -n 'Connecting to AKS cluster...'
+    echo_n_log 'Connecting to AKS cluster...'
 
     if ! az aks get-credentials -g $rg -n $cluster_name --admin --overwrite-existing -o none --only-show-errors >/dev/null; then
         echo_reset_err 'Error: Failed to connect to AKS cluster.'
@@ -588,16 +614,14 @@ function create_arc_aks_appservice() {
 
     echo "done."
 
-    kubectl get ns
-
     echo '##################################################################################################################################################################'
     echo '[Optional] Run these commands in separate terminals to watch the Arc and App Service K8s objects come up'
     echo 'watch -n 5 kubectl get pods -n azure-arc'
-    echo 'watch -n 5 kubectl get svc,pods -n appservice-ns'
-    echo 'watch -n 5 kubectl get svc,pods -n arcdata'
+    echo "watch -n 5 kubectl get svc,pods -n ${NAMESPACE}"
+    echo "watch -n 5 kubectl get svc,pods -n ${ARC_DATA_NAMESPACE}"
     echo '##################################################################################################################################################################'
 
-    echo -n "Connecting AKS cluster to Azure Arc (this may take a few minutes)..."
+    echo_n_log "Connecting AKS cluster to Azure Arc (this may take a few minutes)..."
 
     if ! az connectedk8s connect -g $rg -n $cluster_name -o none --only-show-errors >/dev/null; then
         echo_reset_err 'Error: failed to install Azure Arc on AKS cluster'
@@ -606,10 +630,10 @@ function create_arc_aks_appservice() {
 
     connected_cluster_id=$(az connectedk8s show -g $rg -n $cluster_name -o tsv --query id --only-show-errors) >/dev/null
 
-    echo "Connecting AKS cluster to Azure Arc (this may take a few minutes)...done."
+    echo_log "Connecting AKS cluster to Azure Arc (this may take a few minutes)...done."
 
     # deploy the arc data k8s extension
-    echo -n "Installing Arc Data Services extension in namespace: ${ARC_DATA_NAMESPACE}..."
+    echo_n_log "Installing Arc Data Services extension in namespace: ${ARC_DATA_NAMESPACE}..."
 
     arc_ext_id=$(az k8s-extension create \
         -c $cluster_name \
@@ -636,30 +660,30 @@ function create_arc_aks_appservice() {
         exit 1
     fi
 
-    echo "Installing Arc Data Services extension in namespace: ${ARC_DATA_NAMESPACE}...done."
+    echo_log "Installing Arc Data Services extension in namespace: ${ARC_DATA_NAMESPACE}...done."
 
     log_resource_id $arc_ext_id
 
-    echo -n "Creating arc data custom location ${arc_custom_location_name}..."
+    echo_n_log "Creating arc data custom location ${arc_custom_location_name}..."
 
     if ! arc_custom_location_id=$(az customlocation create -g $rg -n $arc_custom_location_name --host-resource-id $connected_cluster_id --namespace $ARC_DATA_NAMESPACE --cluster-extension-ids $arc_ext_id -o tsv --query id --only-show-errors) >/dev/null; then
         echo_reset_err "Error: failed to create arc data custom location ${custom_location_name}"
         exit 1
     fi
 
-    echo "Creating arc data custom location ${arc_custom_location_name}...done."
+    echo_log "Creating arc data custom location ${arc_custom_location_name}...done."
 
     log_resource_id $arc_custom_location_id
 
-    echo -n 'Waiting for arc data custom location to be in ready state...'
+    echo_n_log 'Waiting for arc data custom location to be in ready state...'
     if ! az resource wait -o none --only-show-errors --timeout $MAX_WAIT_SECONDS --resource-type 'microsoft.extendedlocation/customlocations' --ids $arc_custom_location_id --custom "properties.provisioningState=='Succeeded'" >/dev/null; then
         echo_reset_err 'Error: failed to wait for arc data custom location to finish creating on AKS cluster'
         exit 1
     fi
-    echo 'Waiting for arc data custom location to be in ready state...done'
+    echo_log 'Waiting for arc data custom location to be in ready state...done'
 
     # Add Contributor and Monitor Metrics Publisher roles to sp scoped to the resource group
-    echo -n "Adding role assignments Contributor & MonitoringMetricsPublisher to sp scoped to resource group ${rg}..."
+    echo_n_log "Adding role assignments Contributor & MonitoringMetricsPublisher to sp scoped to resource group ${rg}..."
     if ! az role assignment create --assignee $SP_CLIENT_ID --role 'Contributor' --scope $rg_id -o none --only-show-errors >/dev/null; then
         echo_reset_err "Error: failed to add Contributor role to resource group ${rg}"
         exit 1
@@ -671,7 +695,7 @@ function create_arc_aks_appservice() {
     fi
     echo "done."
 
-    echo -n 'Deploying ARM template for Azure Data Controller in Directly Connected Mode (this may take a few minutes)...'
+    echo_n_log 'Deploying ARM template for Azure Data Controller in Directly Connected Mode (this may take a few minutes)...'
     az group deployment create \
         -n $arc_dc_deployment \
         -g $rg \
@@ -701,11 +725,11 @@ function create_arc_aks_appservice() {
         echo_reset_err "Error: failed to create Azure Arc Data Controller ${arc_dc_name} on AKS cluster"
         exit 1
     fi
-    echo 'Deploying ARM template for Azure Data Controller in Directly Connected Mode (this may take a few minutes)...done.'
+    echo_log 'Deploying ARM template for Azure Data Controller in Directly Connected Mode (this may take a few minutes)...done.'
 
     log_resource_id ${arc_dc_id}
 
-    echo -n 'Waiting for Azure Arc Data Controller to be in ready state...'
+    echo_n_log 'Waiting for Azure Arc Data Controller to be in ready state...'
     if ! az resource wait -o none --only-show-errors --timeout $MAX_WAIT_SECONDS --resource-type 'microsoft.azurearcdata/datacontrollers' --ids $arc_dc_id --custom "properties.k8sRaw.status.state=='Ready'" >/dev/null; then
         echo_reset_err 'Error: failed to wait for Azure Arc Data Controller to finish creating on AKS cluster'
         exit 1
@@ -724,7 +748,7 @@ function create_arc_aks_appservice() {
         exit 1
     fi
 
-    echo 'Waiting for Azure Arc Data Controller to be in ready state...done.'
+    echo_log 'Waiting for Azure Arc Data Controller to be in ready state...done.'
 
     # create the database based on the flag passed in
     if [[ "${ARC_SQL_DB_TYPE_FLAG}" == 'sqlmi' ]]; then
@@ -738,7 +762,7 @@ function create_arc_aks_appservice() {
     fi
 
     # install app service extension on AKS, and create app service
-    echo -n "Installing app service extensions in AKS cluster (this will take a few minutes)..."
+    echo_n_log "Installing app service extensions in AKS cluster (this will take a few minutes)..."
     local workspace_id_enc="${LOG_ANALYTICS_WORKSPACE_IDS_ENC[$rg]}"
     local key_enc="${LOG_ANALYTICS_KEYS_ENC[$rg]}"
 
@@ -779,22 +803,22 @@ function create_arc_aks_appservice() {
         exit 1
     fi
 
-    echo 'Installing app service extensions in AKS cluster (this will take a few minutes)...done'
+    echo_log 'Installing app service extensions in AKS cluster (this will take a few minutes)...done'
 
     log_resource_id $aks_extension_id
 
-    echo -n "Creating app service custom location ${custom_location_name}..."
+    echo_n_log "Creating app service custom location ${custom_location_name}..."
 
     if ! custom_location_id=$(az customlocation create -g $rg -n $custom_location_name --host-resource-id $connected_cluster_id --namespace $NAMESPACE --cluster-extension-ids $aks_extension_id -o tsv --query id --only-show-errors) >/dev/null; then
         echo_reset_err "Error: failed to create custom location ${custom_location_name}"
         exit 1
     fi
 
-    echo "Creating app service custom location ${custom_location_name}...done."
+    echo_log "Creating app service custom location ${custom_location_name}...done."
 
     log_resource_id $custom_location_id
 
-    echo -n "Creating App Service K8s Environment in ${custom_location_name} (this may take a few minutes)..."
+    echo_n_log "Creating App Service K8s Environment in ${custom_location_name} (this may take a few minutes)..."
 
     if ! k8se_id=$(az appservice kube create -g $rg -n $app_service_kube_env_name --custom-location $custom_location_id --static-ip $static_ip -o tsv --query id --only-show-errors) >/dev/null; then
         echo_reset_err "Error: failed to create App Service K8s Envrionment ${app_service_kube_env_name}"
@@ -812,29 +836,29 @@ function create_arc_aks_appservice() {
         exit 1
     fi
 
-    echo "Creating App Service K8s Environment in ${custom_location_name} (this may take a few minutes)...done."
+    echo_log "Creating App Service K8s Environment in ${custom_location_name} (this may take a few minutes)...done."
 
     log_resource_id $k8se_id
 
-    echo -n "Creating App Service Plan ${app_service_plan_name} in ${custom_location_name}..."
+    echo_n_log "Creating App Service Plan ${app_service_plan_name} in ${custom_location_name}..."
 
     if ! app_service_plan_id=$(az appservice plan create -g $rg -n $app_service_plan_name --custom-location $custom_location_id --per-site-scaling --is-linux --sku K1 -o tsv --query id --only-show-errors) >/dev/null; then
         echo_reset_err "Error: failed to create App Service Plan ${app_service_plan_name}"
         exit 1
     fi
 
-    echo "Creating App Service Plan ${app_service_plan_name} in ${custom_location_name}...done."
+    echo_log "Creating App Service Plan ${app_service_plan_name} in ${custom_location_name}...done."
 
     log_resource_id $app_service_plan_id
 
-    echo -n "Creating App Service ${app_service_name} in ${custom_location_name}..."
+    echo_n_log "Creating App Service ${app_service_name} in ${custom_location_name}..."
 
     if ! app_service_id=$(az webapp create --plan $app_service_plan_name -g $rg -n $app_service_name --custom-location $custom_location_id --runtime "DOTNET|5.0" -o tsv --query id --only-show-errors) >/dev/null; then
         echo_reset_err "Error: failed to create App Service ${app_service_name}"
         exit 1
     fi
 
-    echo "Creating App Service ${app_service_name} in ${custom_location_name}...done."
+    echo_log "Creating App Service ${app_service_name} in ${custom_location_name}...done."
 
     log_resource_id $app_service_id
 
@@ -843,7 +867,7 @@ function create_arc_aks_appservice() {
         appservice_sql_key="${APPSERVICE_PGSQL_CONN_STR_KEY}"
     fi
 
-    echo -n "Adding ${ARC_SQL_DB_TYPE_FLAG} connection string to app service config..."
+    echo_n_log "Adding ${ARC_SQL_DB_TYPE_FLAG} connection string to app service config..."
 
     if ! az webapp config appsettings set -g $rg -n $app_service_name --settings $appservice_sql_key="${CONN_STRINGS[$rg]}" ASPNETCORE_ENVIRONMENT="Development" >/dev/null; then
         echo_reset_err "Error: failed to configure ${ARC_SQL_DB_TYPE_FLAG} connection string in App Service ${app_service_name}"
@@ -852,7 +876,7 @@ function create_arc_aks_appservice() {
 
     echo 'done.'
 
-    echo -n "Deploying Hello World web app to ${app_service_name} in ${custom_location_name}..."
+    echo_n_log "Deploying Hello World web app to ${app_service_name} in ${custom_location_name}..."
     if ! az webapp deployment source config-zip -g $rg -n $app_service_name --src $WEBAPP_PATH -o none --only-show-errors >/dev/null; then
         echo_reset_err "Error: failed to deploy Hello World to to ${app_service_name} in custom location ${custom_location_name}"
         exit 1
@@ -861,8 +885,8 @@ function create_arc_aks_appservice() {
 
     host=$(az webapp show -n $app_service_name -g $rg -o tsv --query defaultHostName --only-show-errors) &>/dev/null
     url="https://${host}"
-    echo "Hello World is now deployed in ${custom_location_name}."
-    echo "${url}"
+    echo_log "Hello World is now deployed in ${custom_location_name}."
+    echo_log "${url}"
 }
 
 ##############################################################
@@ -1032,7 +1056,7 @@ while :; do
     # If invalid options were passed, then getopt should have reported an error,
     # which we checked as VALID_ARGUMENTS when getopt was called...
     *)
-        echo "Unexpected option: $1 - this should not happen."
+        echo_log "Unexpected option: $1 - this should not happen."
         print_usage
         break
         ;;
@@ -1112,6 +1136,6 @@ unset $LOG_ANALYTICS_KEYS
 unset $LOG_ANALYTICS_WORKSPACE_IDS
 unset $CONN_STRINGS
 
-echo 'end.'
+echo_log 'end.'
 
 exit 0
