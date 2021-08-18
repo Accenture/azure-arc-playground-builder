@@ -64,7 +64,7 @@ declare -A CONN_STRINGS                    # Key: resourceGroupName, Value: #con
 function echo_log(){
     local str=$1
     local date_str=$(date +"%Y-%m-%dT%T")
-    echo "${date_str} | ${str}"
+    echo "${date_str}  ${str}"
 }
 
 ####################################################################
