@@ -8,6 +8,7 @@ LOCAL_HOST_NAME=''
 REGION=''
 CREATE_ARC_DATA_SERVICES=false
 HELP_FLAG=false
+VERBOSE_FLAG=false
 KUBECTX_FLAG='docker-desktop'
 
 # These must be provided if choosing to deploy arc data services
@@ -20,7 +21,6 @@ SP_SECRET='' # Use this command if pw needs to be regenerated - $(az ad sp crede
 # Only change these if you know what you're doing
 SERVICE_POLL_SECONDS=10 # Check every 10s for the envoy service to be created in the cluster
 MAX_WAIT_SECONDS=1200   # Wait up to 20 minutes for the envoy service to be created in the cluster
-LOG_RESOURCES=true
 RAND="$(echo $RANDOM | tr '[0-9]' '[a-z]')" # Unique suffix
 RESOURCE_GROUP="${RAND}"
 WORKSPACE_NAME="${RAND}-workspace"
@@ -313,14 +313,14 @@ function echo_reset_err() {
 ##############################################################
 # Echo resource id to output
 # Globals:
-#   LOG_RESOURCES
+#   VERBOSE_FLAG
 # Arguments:
 #   resource id
 ##############################################################
 function log_resource_id() {
     local resource_id=$1
 
-    if [[ "${LOG_RESOURCES}"=="true" ]]; then
+    if [[ "${VERBOSE_FLAG}" == "true" ]]; then
         echo_log "${resource_id}"
     fi
 }
@@ -350,7 +350,7 @@ function create_local_storage_provisioner(){
 ##############################################################
 # Creates Arc Data Services with PostgreSQL Hyperscale
 # Globals:
-#   LOG_RESOURCES
+#   
 # Arguments:
 #   resource id
 ##############################################################
@@ -551,6 +551,7 @@ Arguments
   --kubectx -k        [Optional] : Name of existing kubernetes context to use.
                                    Default value is docker-desktop
   --help -h                      : Print the script usage message.
+  --verbose -v                   : Print resource ids and other verbose information.
 
 Examples
     Create an Azure WebApp on Arc-connected local Docker Desktop K8s clusterregistered to eastus region.
@@ -569,7 +570,7 @@ Examples
 }
 
 # BEGIN EXECUTION
-PARSED_OPTIONS=$(getopt -a -n deploy-arc-ddk8s.sh -o l:hn:k: --long location:,help,cluster-name:,kubectx:,create-arc-data,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
+PARSED_OPTIONS=$(getopt -a -n deploy-arc-ddk8s.sh -o l:hn:k:v --long location:,help,cluster-name:,kubectx:,verbose,create-arc-data,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
 
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -583,6 +584,7 @@ case "$1" in
     -l | --location)        REGION="$2" ; shift 2 ;;
     -n | --cluster-name)    LOCAL_HOST_NAME="$2" ; shift 2 ;;
     -h | --help)            print_usage  ; shift   ;;
+    -v | --verbose)         VERBOSE_FLAG=true  ; shift   ;;
     -k | --kubectx)         KUBECTX_FLAG="$2" ; shift 2 ;;
     --create-arc-data)      CREATE_ARC_DATA_SERVICES=true  ; shift   ;;
     --spn-id)               SP_CLIENT_ID="$2"  ; shift 2  ;;
