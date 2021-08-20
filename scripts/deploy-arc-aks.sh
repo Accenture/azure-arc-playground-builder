@@ -10,12 +10,12 @@ HELP_FLAG=false
 ARC_SQL_DB_TYPE_FLAG='sqlmi'
 LOCATION_FLAG=''
 CUSTOM_LOCATION_NAME_FLAG=''
+VERBOSE_FLAG=false
 
 # CONSTANT SETUP
 # Only change these if you know what you are doing.
 SUBSCRIPTION_ID=''
 TENANT_ID=''
-LOG_RESOURCES=true
 MAX_WAIT_SECONDS=1200 # wait up to 20 minutes for the resources to be created in the cluster
 SERVICE_POLL_SECONDS=10
 
@@ -32,18 +32,18 @@ ARCDC_ARM_PARAMETERS='data/datacontroller.parameters.json'
 SQLMI_ARM_TEMPLATE='data/sqlmi-arc/sqlmiarc.template.json'
 SQLMI_ARM_PARAMETERS='data/sqlmi-arc/sqlmiarc.parameters.json'
 LOCAL_HOST_PUBLIC_IP=$(dig +short myip.opendns.com @resolver1.opendns.com) # ISP WAN IPv4 address for the local network - see http://whatismyip.com.
-APPSERVICE_SQLMI_CONN_STR_KEY='ConnectionStrings__Sql' # Connection string name, Hello World webapp looks for this during startup
+APPSERVICE_SQLMI_CONN_STR_KEY='ConnectionStrings__Sql'                     # Connection string name, Hello World webapp looks for this during startup
 
 ## Arc Pgsql
 PGSQL_ARM_TEMPLATE='data/postgres-arc/psqlarc.template.json'
 PGSQL_ARM_PARAMETERS='data/postgres-arc/psqlarc.parameters.json'
-PGSQL_EV='12' #or 11
-PGSQL_ARC_WORKERS=0 # FOR DEMO ONLY USE CITUS NODE
+PGSQL_EV='12'                                             #or 11
+PGSQL_ARC_WORKERS=0                                       # FOR DEMO ONLY USE CITUS NODE
 APPSERVICE_PGSQL_CONN_STR_KEY='ConnectionStrings__Npgsql' # Connection string name, Hello World webapp looks for this during startup
 
 ## Arc App Service on AKS
-NAMESPACE="appservice-ns"                              # Namespace in your cluster to install the extension and provision resources, don't change this
-WEBAPP_PATH="../artifacts/HelloWorld-sql.zip"          # path to pre-compiled webapp zip
+NAMESPACE="appservice-ns"                     # Namespace in your cluster to install the extension and provision resources, don't change this
+WEBAPP_PATH="../artifacts/HelloWorld-sql.zip" # path to pre-compiled webapp zip
 
 # VARIABLES
 declare -A RESOURCE_GROUPS                 # Key: region, Value: resourceGroupName
@@ -61,7 +61,7 @@ declare -A CONN_STRINGS                    # Key: resourceGroupName, Value: #con
 # Arguments:
 #   None
 ####################################################################
-function echo_log(){
+function echo_log() {
     local str=$1
     local date_str=$(date +"%Y-%m-%dT%T")
     echo "${date_str}  ${str}"
@@ -74,7 +74,7 @@ function echo_log(){
 # Arguments:
 #   None
 ####################################################################
-function echo_n_log(){
+function echo_n_log() {
     local str=$1
     local date_str=$(date +"%Y-%m-%dT%T")
     echo -n "${date_str}  ${str}"
@@ -293,14 +293,14 @@ function echo_reset_err() {
 ####################################################################
 # Prints resource id
 # Globals:
-#   LOG_RESOURCES
+#   VERBOSE_FLAG
 # Arguments:
 #   resource_id
 ####################################################################
 function log_resource_id() {
     local resource_id=$1
 
-    if [[ "${LOG_RESOURCES}"=="true" ]]; then
+    if [[ "${VERBOSE_FLAG}" == "true" ]]; then
         echo_log "${resource_id}"
     fi
 }
@@ -398,7 +398,7 @@ function create_log_analytics_workspace() {
 #   region
 #   arc_dc_custom_location_id
 ####################################################################
-function create_sql_mi(){
+function create_sql_mi() {
     local rg=$1
     local custom_location_name=$2
     local rand=$3
@@ -441,7 +441,7 @@ function create_sql_mi(){
         echo_reset_err 'Error: failed to wait for sql managed instance to finish creating on AKS cluster'
         exit 1
     fi
-    echo_log'Waiting for SQL Managed Instance to be in ready state...done.'
+    echo_log 'Waiting for SQL Managed Instance to be in ready state...done.'
 
     sqlmi_primary_endpoint=$(az resource show -o tsv -g $rg -n $sqlmi_server_name --resource-type microsoft.azurearcdata/sqlmanagedinstances --query properties.k8sRaw.status.primaryEndpoint --only-show-errors --api-version 2021-07-01-preview) >/dev/null
 
@@ -476,7 +476,7 @@ function create_sql_mi(){
 #   arc_custom_location_id
 #   arc_dc_id
 ####################################################################
-function create_pgsql(){
+function create_pgsql() {
     local rg=$1
     local custom_location_name=$2
     local rand=$3
@@ -489,7 +489,7 @@ function create_pgsql(){
     local pgsql_primary_endpoint=''
     local pgsql_id=''
 
-    # Create postgresql hyperscale server 
+    # Create postgresql hyperscale server
     echo_n_log 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...'
     az group deployment create \
         -n $pgsql_deployment \
@@ -499,16 +499,16 @@ function create_pgsql(){
         --template-file "${PGSQL_ARM_TEMPLATE}" \
         --parameters "@${PGSQL_ARM_PARAMETERS}" \
         --parameters \
-            dataControllerId="${arc_dc_id}" \
-            customLocation="${arc_custom_location_id}" \
-            location="${region}" \
-            password="${AZDATA_PASSWORD}" \
-            namespace="${ARC_DATA_NAMESPACE}" \
-            postgresEngineVersion="${PGSQL_EV}" \
-            subscription="${SUBSCRIPTION_ID}" \
-            resourceGroup="${rg}" \
-            resourceName="${pgsql_server_name}"
-    
+        dataControllerId="${arc_dc_id}" \
+        customLocation="${arc_custom_location_id}" \
+        location="${region}" \
+        password="${AZDATA_PASSWORD}" \
+        namespace="${ARC_DATA_NAMESPACE}" \
+        postgresEngineVersion="${PGSQL_EV}" \
+        subscription="${SUBSCRIPTION_ID}" \
+        resourceGroup="${rg}" \
+        resourceName="${pgsql_server_name}"
+
     pgsql_id=$(az resource show -o tsv -g $rg -n $pgsql_server_name --resource-type microsoft.azurearcdata/postgresinstances --query id --only-show-errors) >/dev/null
 
     echo_n_log 'Waiting for PostgreSQL to be in ready state...'
@@ -527,7 +527,7 @@ function create_pgsql(){
     echo_log 'Creating ARM template deployment for Azure Arc PostgreSQL Hyperscale in direct mode (this may take a few minutes)...done'
     log_resource_id ${pgsql_id}
     echo_log "PostgreSQL External Endpoint: ${pgsql_primary_endpoint}"
-    
+
     # set the PostgreSQL connection string using K8s DNS, <service>.<namespace>
     CONN_STRINGS[$rg]="Host=${pgsql_server_name}-external-svc.${ARC_DATA_NAMESPACE};Port=5432;Database=postgres;Username=postgres;Password=${AZDATA_PASSWORD};SslMode=Disable"
 }
@@ -896,7 +896,7 @@ function create_arc_aks_appservice() {
 # Arguments:
 #   None
 ##############################################################
-function print_usage(){
+function print_usage() {
     HELP_FLAG=true
     echo '''
 Usage
@@ -929,6 +929,7 @@ Arguments
                                                - English lowercase letters, numbers (0-9)
                                                - Non-alphanumeric characters (!, $, #, %, etc.).
   --help -h                              : Print the script usage message.
+  --verbose -v                           : Print resource ids and other verbose information.
 
 Examples
     Create an Azure WebApp & Arc Postgres Hyperscale on Arc-connected AKS cluster registered to eastus region
@@ -963,7 +964,7 @@ Examples
 # Arguments:
 #   None
 ##############################################################
-function check_inputs(){
+function check_inputs() {
     # location and custom-location-name flags take precedence over the array env vars
     if [[ -n "${LOCATION_FLAG}" ]]; then
 
@@ -1006,7 +1007,7 @@ function check_inputs(){
 }
 
 # BEGIN EXECUTION
-PARSED_OPTIONS=$(getopt -a -n deploy-arc-aks.sh -o l:hn: --long location:,help,custom-location-name:,arc-sql-db-type:,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
+PARSED_OPTIONS=$(getopt -a -n deploy-arc-aks.sh -o l:hn:v --long location:,help,custom-location-name:,verbose,arc-sql-db-type:,spn-id:,spn-secret:,sql-username:,sql-password: -- "$@")
 
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -1026,6 +1027,10 @@ while :; do
         ;;
     -h | --help)
         print_usage
+        shift
+        ;;
+    -v | --verbose)
+        VERBOSE_FLAG=true
         shift
         ;;
     --arc-sql-db-type)
