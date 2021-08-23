@@ -15,5 +15,8 @@ The set of scripts & templates in this repo do the following:
 - [Arc App Service + Arc SQL Managed Instance or PostgreSQL Hyperscale on AKS](docs/deploying-arc-aks.md)
 - [Arc App Service on local Docker Desktop](docs/deploying-arc-appservice-ddk8s.md)
 
+## Demo
+![Arc Demo](img/arc-demo.mp4)
+
 ## Next Steps
 Check out Microsoft's [Azure Arc Jumpstart - ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/). ArcBox is a larger-scale Arc sandbox, capable of evaluating Azure Arc scenarios on a more "on-prem" production-like Kubernetes environment.
