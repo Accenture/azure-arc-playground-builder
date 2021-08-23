@@ -53,11 +53,11 @@ See [WSL config](https://docs.microsoft.com/en-us/windows/wsl/wsl-config#configu
 
 - Reset the Docker Desktop Kubernetes cluster
 
-    ![Reset Docker Desktop K8s](images/reset-k8s-sm.png)
+    ![Reset Docker Desktop K8s](img/reset-k8s-sm.png)
 
 - Stop and Start Docker Desktop (do not restart, see [Troubleshooting](#troubleshooting))
 
-    ![Stop and Start Docker Desktop](images/stop-docker.png)
+    ![Stop and Start Docker Desktop](img/stop-docker.png)
 
 ### Create WSL2 mountpoints for persistent volume storage
 This step is only required if creating data services. Arc Data services created by this script use dynamically provisioned local-storage persistent volumes. Docker Desktop WSL2 uses cross distro mounts. Mountpoints must be created in /mnt/wsl to be made available as viable volume mounts for Kubernetes pods. See [create-pv-mounts.sh](scripts/create-pv-mounts.sh) for more details. See this [thread](https://github.com/docker/for-win/issues/5325#issuecomment-567594291) for more WSL2 Docker Desktop mountpoint details. 
@@ -72,10 +72,10 @@ Execute the script to create directories & mountpoints in the WSL2 terminal.
 1. Reserve a static IP for the local machine via the router's admin page
 1. Enable TCP port-forwarding for the static IP on ports: 80, 443, 8081 via the router's admin page. (Note router admin might look different than the screenshot below) 
 
-    ![Router Admin](images/staticip-portforwarding-eero-sm.jpg)
+    ![Router Admin](img/staticip-portforwarding-eero-sm.jpg)
 1. Connect local machine to local network using the static IP
 
-    ![Static IP](images/static-ip-localhost.png)
+    ![Static IP](img/static-ip-localhost.png)
 
 1. Add inbound and outbound OS firewall rules for ports 80, 443, 8081
 1. Ensure none of the ports (80,443,8081) are reserved on the OS. For Windows - via CMD with Administrative Privileges
@@ -86,7 +86,7 @@ Execute the script to create directories & mountpoints in the WSL2 terminal.
     # stop the http service to release port 80 as reserved port
     net stop http /y
     ```
-    ![Excluded Ports](images/excluded-ports.png)
+    ![Excluded Ports](img/excluded-ports.png)
 
 ## Execute the script
 **Complete all prerequisites before proceeding with these steps**
@@ -101,7 +101,7 @@ Execute the script to create directories & mountpoints in the WSL2 terminal.
 
 The following arguments are available in the deploy-arc-ddk8s script.
 
-![Deploy Ddk8s Help](images/ddk8s-help-options.png)
+![Deploy Ddk8s Help](img/ddk8s-help-options.png)
 
 ## Microsoft documentation
 - [Connect an existing Kubernetes cluster to Azure Arc](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli)

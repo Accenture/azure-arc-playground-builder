@@ -8,12 +8,12 @@ The set of scripts & templates in this repo do the following:
 
 ## Prerequisites
 
-- [Set up Workstation](prerequisites.md)
+- [Set up Workstation](docs/prerequisites.md)
 
 ## Deployment Scripts
 
-- [Arc App Service + Arc SQL Managed Instance or PostgreSQL Hyperscale on AKS](deploying-arc-aks.md)
-- [Arc App Service on local Docker Desktop](deploying-arc-appservice-ddk8s.md)
+- [Arc App Service + Arc SQL Managed Instance or PostgreSQL Hyperscale on AKS](docs/deploying-arc-aks.md)
+- [Arc App Service on local Docker Desktop](docs/deploying-arc-appservice-ddk8s.md)
 
 ## Next Steps
 Check out Microsoft's [Azure Arc Jumpstart - ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/). ArcBox is a larger-scale Arc sandbox, capable of evaluating Azure Arc scenarios on a more "on-prem" production-like Kubernetes environment.

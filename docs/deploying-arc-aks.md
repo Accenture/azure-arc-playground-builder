@@ -46,7 +46,7 @@ The [deploy-arc-aks.sh](scripts/deploy-arc-aks.sh) script will deploy a Hello Wo
 
 The [deploy-arc-aks.sh](scripts/deploy-arc-aks.sh) script receives the following arguments:
 
-![Aks Options](images/aks-help.png)
+![Aks Options](img/aks-help.png)
 
 ## Microsoft Documentation References
 - [Connect an existing Kubernetes cluster to Azure Arc](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli)
