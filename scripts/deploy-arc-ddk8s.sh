@@ -808,7 +808,7 @@ fi
 echo 'done.'
 
 echo_n_log 'Waiting for app service kube extensions to finish install (this may take a few minutes)...'
-if ! az resource wait --ids $APPSERVICE_EXTENSION_ID --custom "properties.installState!='Pending'" --api-version "2020-07-01-preview" -o none --only-show-errors >/dev/null; then
+if ! az resource wait --ids $APPSERVICE_EXTENSION_ID --custom "properties.installState=='Installed'" --api-version "2020-07-01-preview" -o none --only-show-errors >/dev/null; then
     echo_reset_err "Error: Unable to install app service extension in ddk8s cluster."
     exit 1
 fi
