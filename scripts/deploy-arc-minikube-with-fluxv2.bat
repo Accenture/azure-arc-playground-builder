@@ -1,4 +1,4 @@
-minikube start --memory=10g --cpus=4 --disk-size=80g
+minikube start --memory=10g --cpus=4 --disk-size=80g --hyperv-virtual-switch "External Virtual Switch"
 
 REM SET LOCATION, AND SET RG, REMOVING ANY '.'
 set location=eastus
