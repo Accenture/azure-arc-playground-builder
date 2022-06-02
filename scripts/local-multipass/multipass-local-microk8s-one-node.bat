@@ -1,5 +1,3 @@
-REM TODO - PASS IN subscription, minikube local name, minikube remote name, resource group, location, service principal info
-REM TODO - change commands to multipass exec
 REM docs - https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli
 rem docs - https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/tutorial-use-gitops-connected-cluster
 rem az ad sp create-for-rbac --role Contributor --scopes /subscriptions/%mySubscriptionId%
@@ -7,8 +5,8 @@ rem needed for https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/troub
 rem az ad sp show --id %myservicePrincipalId% --query objectId -o tsv
 rem az login --service-principal -u %servicePrincipalId% -p %servicePrincipalSecret% --tenant %myTenantId%
 
-rem checks for multipass, sets currentuser, randomnumber, clustername, arcclustername
-rem need to setup servicePrincipalAppId, servicePrincipalPassword, servicePrincipalTenant, subscriptionId
+rem need to setup environment variables for:
+rem   myTenantId, mySubscriptionId, myServicePrincipalId, myServicePrincipalObjectId, myServicePrincipalSecret, myResourceGroup
 
 set currentuser=%username%
 set currentuser=%currentuser:.=%
@@ -55,6 +53,8 @@ multipass exec %localclustername% -- bash -c "az account set --subscription %myS
 multipass exec %localclustername% -- bash -c "az extension add --upgrade --yes -n connectedk8s -o none"
 multipass exec %localclustername% -- bash -c "az extension add --upgrade --yes -n k8s-extension -o none"
 multipass exec %localclustername% -- bash -c "az extension add --upgrade --yes -n customlocation -o none"
+multipass exec %localclustername% -- bash -c "az provider register --namespace Microsoft.Kubernetes --wait -o none"
+multipass exec %localclustername% -- bash -c "az provider register --namespace Microsoft.KubernetesConfiguration --wait -o none"
 multipass exec %localclustername% -- bash -c "az provider register --namespace Microsoft.ExtendedLocation --wait -o none"
 
 rem now connect the k8s cluster
