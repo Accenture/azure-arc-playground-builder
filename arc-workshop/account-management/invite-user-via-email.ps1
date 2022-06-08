@@ -3,17 +3,24 @@ Param(
     $Email
 )
 
-# https://docs.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/new-mginvitation?view=graph-powershell-1.0
-# todo:
-# - wait for 30s 
-# -   add to aad group that has access to azure subscription
-# -   add to aad group that has access to aad app admin
-# - make sure we know cleanup script to delete user
+Write-Host "Connecting to Microsoft Graph for Tenant Id $Env:myTenantId"
+Connect-MgGraph -TenantId $Env:myTenantId -Scopes "User.ReadWrite.All","Application.ReadWrite.All","Group.ReadWrite.All", "Directory.ReadWrite.All"
 
-Connect-MgGraph -TenantId $Env:myTenantId -Scopes user.readwrite.all
+Write-Host "Inviting $Email to the tenant"
 New-MgInvitation  -InvitedUserEmailAddress $Email -InviteRedirectUrl "https://go.accenture.com/azurehack" -SendInvitationMessage:$true
 
-$UserId = (Get-MgUser -Filter "Mail eq '$Email'").Id
-$UserPrincipalName =  (Get-MgUser -Filter "Mail eq '$Email'").UserPrincipalName
-$GroupObjectId = (Get-AzureADGroup -Filter "DisplayName eq 'Hackathon'").ObjectId
+Write-Host "Invited $Email to tenant, waiting 30 seconds"
+Start-Sleep -Seconds 30
 
+$UserId=(Get-MgUser -Filter "Mail eq '$Email'").Id
+$HackathonGroupId=(Get-MgGroup -Filter "DisplayName eq 'Hackathon'").Id
+
+Write-Host "UserId=$UserId"
+Write-Host "HackathonGroupId=$HackathonGroupId"
+
+Read-Host -Prompt "If UserId isn't found, abort!"
+
+Write-Host "Adding to Hackthaon Azure AD Group"
+New-MgGroupMember -GroupId $HackathonGroupId -DirectoryObjectId $UserId
+
+Read-Host -Prompt 'All done - press enter to continue!'
