@@ -1,0 +1,2 @@
+az aks create -g  -n MyManagedCluster --enable-managed-identity --node-count 1 --enable-aad --aad-admin-group-object-ids <id-1,id-2> --aad-tenant-id <id>
+
