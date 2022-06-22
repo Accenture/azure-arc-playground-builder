@@ -7,7 +7,7 @@ Write-Host "myServicePrincipalId       :",$([Environment]::GetEnvironmentVariabl
 Write-Host "myServicePrincipalObjectId :",$([Environment]::GetEnvironmentVariable('myServicePrincipalObjectId', 'User'))
 Write-Host "myServicePrincipalSecret   :",$([Environment]::GetEnvironmentVariable('myServicePrincipalSecret', 'User'))
 Write-Host "myAzureLocation            :",$([Environment]::GetEnvironmentVariable('myAzureLocation', 'User'))
-Write-Host "myAzureADGroup             :",$([Environment]::GetEnvironmentVariable('myAzureADGroup', 'User'))z
+Write-Host "myAzureADGroup             :",$([Environment]::GetEnvironmentVariable('myAzureADGroup', 'User'))
 Write-Host "--------------------------------------------------------------------------------"
 Write-Host ""
 Write-Host "Commands to replicate to .profile for Linux"
