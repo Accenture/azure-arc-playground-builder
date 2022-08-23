@@ -1,17 +1,13 @@
 set clustername=%1
 set arcclustername=arc-%1
 
-multipass launch -c 4 -m 16g -d 80g -n %clustername% --network name=External impish
+multipass launch -c 4 -m 16g -d 80g -n %clustername% --network name=External lts
 
 rem pause
 
 rem tooling
 multipass exec %clustername% -- bash -c "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
-multipass exec %clustername% -- bash -c "curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -"
-multipass exec %clustername% -- bash -c "sudo apt-get install apt-transport-https --yes"
-multipass exec %clustername% -- bash -c "echo 'deb https://baltocdn.com/helm/stable/debian/ all main' | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list"
-multipass exec %clustername% -- bash -c "sudo apt-get update"
-multipass exec %clustername% -- bash -c "sudo apt-get install helm"
+multipass exec %clustername% -- bash -c "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sudo bash"
 multipass exec %clustername% -- bash -c "sudo snap install kubectl --classic"
 
 rem microk8s
@@ -22,8 +18,9 @@ multipass exec %clustername% -- bash -c "sudo usermod -a -G microk8s $USER"
 multipass exec %clustername% -- bash -c "sudo chown -f -R $USER ~/.kube"
 multipass exec %clustername% -- bash -c "microk8s config > ~/.kube/config"
 multipass exec %clustername% -- bash -c "sudo microk8s status --wait-ready"
-multipass exec %clustername% -- bash -c "sudo microk8s enable dns storage ingress helm3 dashboard"
+multipass exec %clustername% -- bash -c "sudo microk8s enable dns hostpath-storage ingress helm3 dashboard"
 
+rem https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
 REM pause here until things are settled down and you see everything is ok and no more deployments are pending!!!
 multipass exec %clustername% -- bash -c "sudo microk8s kubectl get all --all-namespaces"
 
