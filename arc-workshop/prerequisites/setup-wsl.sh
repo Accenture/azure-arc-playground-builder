@@ -1,3 +1,6 @@
+#usage
+#curl https://raw.githubusercontent.com/Accenture/azure-arc-playground-builder/main/arc-workshop/prerequisites/setup-wsl.sh | sudo bash
+
 #azure cli
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
