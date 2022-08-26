@@ -16,6 +16,9 @@ sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
 sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
 sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 
+#azure cli config preferences
+az config set extension.use_dynamic_install=yes_without_prompt
+
 #azure extensions
 az extension add --upgrade --yes -n connectedk8s -o none
 az extension add --upgrade --yes -n k8s-extension -o none
