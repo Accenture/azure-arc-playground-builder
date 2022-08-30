@@ -9,7 +9,7 @@
 Once you're done with that, From the Azure CLI
 
 ```bash
-az connectedk8s connect --name MYCLUSTERNAME --resource-group MYRESOURCEGROUP
+az connectedk8s connect --name MYCLUSTERNAME --resource-group myAzureResourceGroup
 ```
 
 ```powershell

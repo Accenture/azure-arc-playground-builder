@@ -1,12 +1,12 @@
 REM docs - https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli
 rem docs - https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/tutorial-use-gitops-connected-cluster
-rem az ad sp create-for-rbac --role Contributor --scopes /subscriptions/%mySubscriptionId%
+rem az ad sp create-for-rbac --role Contributor --scopes /subscriptions/%myAzureSubscriptionId%
 rem needed for https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/troubleshooting#enable-custom-locations-using-service-principal
-rem az ad sp show --id %myservicePrincipalId% --query objectId -o tsv
-rem az login --service-principal -u %servicePrincipalId% -p %servicePrincipalSecret% --tenant %myTenantId%
+rem az ad sp show --id %myAzureServicePrincipalId% --query objectId -o tsv
+rem az login --service-principal -u %servicePrincipalId% -p %servicePrincipalSecret% --tenant %myAzureTenantId%
 
 rem need to setup environment variables for:
-rem   myTenantId, mySubscriptionId, myServicePrincipalId, myServicePrincipalObjectId, myServicePrincipalSecret, myResourceGroup
+rem   myAzureTenantId, myAzureSubscriptionId, myAzureServicePrincipalId, myAzureServicePrincipalObjectId, myAzureServicePrincipalSecret, myAzureResourceGroup
 
 set currentuser=%username%
 set currentuser=%currentuser:.=%
@@ -48,8 +48,8 @@ multipass exec %localclustername% -- bash -c "sudo microk8s kubectl get all --al
 rem pause
 
 rem azure stuff
-multipass exec %localclustername% -- bash -c "az login --service-principal -u %myServicePrincipalId% -p %myServicePrincipalSecret% --tenant %myTenantId%"
-multipass exec %localclustername% -- bash -c "az account set --subscription %mySubscriptionId%"
+multipass exec %localclustername% -- bash -c "az login --service-principal -u %myAzureServicePrincipalId% -p %myAzureServicePrincipalSecret% --tenant %myAzureTenantId%"
+multipass exec %localclustername% -- bash -c "az account set --subscription %myAzureSubscriptionId%"
 multipass exec %localclustername% -- bash -c "az extension add --upgrade --yes -n connectedk8s -o none"
 multipass exec %localclustername% -- bash -c "az extension add --upgrade --yes -n k8s-extension -o none"
 multipass exec %localclustername% -- bash -c "az extension add --upgrade --yes -n customlocation -o none"
@@ -58,5 +58,5 @@ multipass exec %localclustername% -- bash -c "az provider register --namespace M
 multipass exec %localclustername% -- bash -c "az provider register --namespace Microsoft.ExtendedLocation --wait -o none"
 
 rem now connect the k8s cluster
-multipass exec %localclustername% -- bash -c "az connectedk8s connect --name %arcclustername% --resource-group %myResourceGroup% --custom-locations-oid %myServicePrincipalObjectId%"
-multipass exec %localclustername% -- bash -c "az connectedk8s enable-features --name %arcclustername% --resource-group %myResourceGroup% --custom-locations-oid %myServicePrincipalObjectId% --features cluster-connect custom-locations"
+multipass exec %localclustername% -- bash -c "az connectedk8s connect --name %arcclustername% --resource-group %myAzureResourceGroup% --custom-locations-oid %myAzureServicePrincipalObjectId%"
+multipass exec %localclustername% -- bash -c "az connectedk8s enable-features --name %arcclustername% --resource-group %myAzureResourceGroup% --custom-locations-oid %myAzureServicePrincipalObjectId% --features cluster-connect custom-locations"

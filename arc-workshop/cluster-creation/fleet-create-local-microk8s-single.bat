@@ -30,8 +30,8 @@ multipass exec %clustername% -- bash -c "sudo microk8s kubectl get all --all-nam
 rem pause
 
 rem azure stuff
-multipass exec %clustername% -- bash -c "az login --service-principal -u %myServicePrincipalId% -p %myServicePrincipalSecret% --tenant %myTenantId%"
-multipass exec %clustername% -- bash -c "az account set --subscription %mySubscriptionId%"
+multipass exec %clustername% -- bash -c "az login --service-principal -u %myAzureServicePrincipalId% -p %myAzureServicePrincipalSecret% --tenant %myAzureTenantId%"
+multipass exec %clustername% -- bash -c "az account set --subscription %myAzureSubscriptionId%"
 multipass exec %clustername% -- bash -c "az extension add --upgrade --yes -n connectedk8s -o none"
 multipass exec %clustername% -- bash -c "az extension add --upgrade --yes -n k8s-extension -o none"
 multipass exec %clustername% -- bash -c "az extension add --upgrade --yes -n customlocation -o none"
@@ -40,5 +40,5 @@ multipass exec %clustername% -- bash -c "az provider register --namespace Micros
 multipass exec %clustername% -- bash -c "az provider register --namespace Microsoft.ExtendedLocation --wait -o none"
 
 rem now connect the k8s cluster
-multipass exec %clustername% -- bash -c "az connectedk8s connect --name %arcclustername% --resource-group %myResourceGroup% --custom-locations-oid %myServicePrincipalObjectId%"
-multipass exec %clustername% -- bash -c "az connectedk8s enable-features --name %arcclustername% --resource-group %myResourceGroup% --custom-locations-oid %myServicePrincipalObjectId% --features cluster-connect custom-locations"
+multipass exec %clustername% -- bash -c "az connectedk8s connect --name %arcclustername% --resource-group %myAzureResourceGroup% --custom-locations-oid %myAzureServicePrincipalObjectId%"
+multipass exec %clustername% -- bash -c "az connectedk8s enable-features --name %arcclustername% --resource-group %myAzureResourceGroup% --custom-locations-oid %myAzureServicePrincipalObjectId% --features cluster-connect custom-locations"
