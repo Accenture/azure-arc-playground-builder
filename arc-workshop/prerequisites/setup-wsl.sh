@@ -20,9 +20,10 @@ sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 az config set extension.use_dynamic_install=yes_without_prompt
 
 #azure extensions
-az extension add --upgrade --yes -n connectedk8s -o none
-az extension add --upgrade --yes -n k8s-extension -o none
-az extension add --upgrade --yes -n customlocation -o none
+az extension add --upgrade --yes --name connectedk8s --output none
+az extension add --upgrade --yes --name k8s-extension --output none
+az extension add --upgrade --yes --name customlocation --output none
+az extension add --upgrade --yes --name appservice-kube --output none
 
 #k9s
 curl -L -o k9s.tar.gz https://github.com/derailed/k9s/releases/download/v0.26.3/k9s_Linux_x86_64.tar.gz
