@@ -46,3 +46,16 @@ multipass exec %clusterid% -- bash -c "az k8s-extension create --name microsoft.
 multipass exec %clusterid% -- bash -c "az k8s-extension create --name microsoft.azuredefender.kubernetes --cluster-type connectedClusters --cluster-name %clusterid% --resource-group %clusterid% --extension-type microsoft.azuredefender.kubernetes"
 
 rem next steps - add app plat extensions and custom location?
+az monitor log-analytics workspace show --resource-group lyle-29 --workspace-name lyle-29 --query customerId --output tsv
+tempLogAnalyticsWorkspaceId=$(az monitor log-analytics workspace show resource-group $clusterid --workspace-name $workspaceName \
+    --query customerId \
+    --output tsv)
+logAnalyticsWorkspaceIdEnc=$(printf %s $logAnalyticsWorkspaceId | base64 -w0) # Needed for the next step
+logAnalyticsKey=$(az monitor log-analytics workspace get-shared-keys \
+    --resource-group $groupName \
+    --workspace-name $workspaceName \
+    --query primarySharedKey \
+    --output tsv)
+logAnalyticsKeyEnc=$(printf %s $logAnalyticsKey | base64 -w0) # Needed for the next step
+
+
