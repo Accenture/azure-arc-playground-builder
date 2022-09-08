@@ -30,3 +30,8 @@ curl -L -o k9s.tar.gz https://github.com/derailed/k9s/releases/download/v0.26.3/
 tar -xvf k9s.tar.gz
 sudo mv k9s /usr/local/bin/k9s
 rm k9s.tar.gz README.md LICENSE
+
+#octant
+curl -LO https://github.com/vmware-tanzu/octant/releases/download/v0.25.1/octant_0.25.1_Linux-64bit.deb
+sudo dpkg -i octant_0.25.1_Linux-64bit.deb
+rm octant_0.25.1_Linux-64bit.deb
