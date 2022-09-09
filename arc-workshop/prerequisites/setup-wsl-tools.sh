@@ -35,3 +35,12 @@ rm k9s.tar.gz README.md LICENSE
 curl -LO https://github.com/vmware-tanzu/octant/releases/download/v0.25.1/octant_0.25.1_Linux-64bit.deb
 sudo dpkg -i octant_0.25.1_Linux-64bit.deb
 rm octant_0.25.1_Linux-64bit.deb
+
+#OPTIONAL SECTION EXAMPLES
+
+#dotnet 6 sdk / runtime on debian
+#wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+#sudo dpkg -i packages-microsoft-prod.deb
+#rm packages-microsoft-prod.deb
+#sudo apt-get update && sudo apt-get install -y dotnet-sdk-6.0
+#sudo apt-get update && sudo apt-get install -y aspnetcore-runtime-6.0
