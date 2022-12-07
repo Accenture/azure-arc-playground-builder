@@ -1,27 +1,10 @@
 set clusterid=%1
 
-multipass launch -c 6 -m 20g -d 80g -n %clusterid% --network name=External lts
+multipass launch -c 6 -m 8g -d 40g -n %clusterid% --network name=External minikube
 
 rem tooling
 multipass exec %clusterid% -- bash -c "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
 multipass exec %clusterid% -- bash -c "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sudo bash"
-multipass exec %clusterid% -- bash -c "sudo snap install kubectl --classic"
-
-rem microk8s
-multipass exec %clusterid% -- bash -c "sudo snap install microk8s --classic --channel=1.25/stable"
-multipass exec %clusterid% -- bash -c "sudo iptables -P FORWARD ACCEPT"
-multipass exec %clusterid% -- bash -c "mkdir ~/.kube"
-multipass exec %clusterid% -- bash -c "sudo usermod -a -G microk8s $USER"
-multipass exec %clusterid% -- bash -c "sudo chown -f -R $USER ~/.kube"
-multipass exec %clusterid% -- bash -c "microk8s config > ~/.kube/config"
-multipass exec %clusterid% -- bash -c "sudo microk8s status --wait-ready"
-
-ping -n 10 127.0.0.1 > NUL
-multipass exec %clusterid% -- bash -c "sudo microk8s enable dns hostpath-storage ingress helm3"
-
-REM pause here until things are settled down and you see everything is ok and no more deployments are pending!!!
-ping -n 60 127.0.0.1 > NUL
-multipass exec %clusterid% -- bash -c "sudo microk8s kubectl get all --all-namespaces"
 
 rem azure stuff
 multipass exec %clusterid% -- bash -c "az config set extension.use_dynamic_install=yes_without_prompt"
@@ -33,9 +16,16 @@ multipass exec %clusterid% -- bash -c "az extension add --upgrade --yes -n custo
 multipass exec %clusterid% -- bash -c "az provider register --namespace Microsoft.Kubernetes --wait -o none"
 multipass exec %clusterid% -- bash -c "az provider register --namespace Microsoft.KubernetesConfiguration --wait -o none"
 multipass exec %clusterid% -- bash -c "az provider register --namespace Microsoft.ExtendedLocation --wait -o none"
+multipass exec %clusterid% -- bash -c "wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh"
+multipass exec %clusterid% -- bash -c "bash ~/install_linux_azcmagent.sh"
 
-rem now connect the k8s cluster
+rem create the resource group for this cluster
 multipass exec %clusterid% -- bash -c "az group create -n %clusterid% -l %myAzureLocation%"
+
+rem now connect the host os
+multipass exec %clusterid% -- bash -c "sudo azcmagent connect --service-principal-id %myAzureServicePrincipalId% --service-principal-secret %myAzureServicePrincipalSecret% --resource-group %clusterid% --tenant-id %myAzureTenantId% --location %MyAzureLocation% --subscription-id %myAzureSubscriptionId% --cloud AzureCloud --correlation-id 01324567-890a-bcde-f012-34567890abcd"
+
+rem now connect the k8s cluster and enable the cluster proxy
 multipass exec %clusterid% -- bash -c "az connectedk8s connect --name %clusterid% --resource-group %clusterid% --custom-locations-oid %myAzureServicePrincipalObjectId%"
 multipass exec %clusterid% -- bash -c "az connectedk8s enable-features --name %clusterid% --resource-group %clusterid% --custom-locations-oid %myAzureServicePrincipalObjectId% --features cluster-connect custom-locations"
 
