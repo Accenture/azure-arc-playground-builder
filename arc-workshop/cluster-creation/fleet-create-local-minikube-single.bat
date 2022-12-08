@@ -22,6 +22,9 @@ multipass exec %clusterid% -- bash -c "bash ~/install_linux_azcmagent.sh"
 rem create the resource group for this cluster
 multipass exec %clusterid% -- bash -c "az group create -n %clusterid% -l %myAzureLocation%"
 
+rem log analytics workspace for this cluster
+multipass exec %clusterid% -- bash -c "az monitor log-analytics workspace create -g %clusterid% --workspace-name %clusterid%
+
 rem now connect the host os
 multipass exec %clusterid% -- bash -c "sudo azcmagent connect --service-principal-id %myAzureServicePrincipalId% --service-principal-secret %myAzureServicePrincipalSecret% --resource-group %clusterid% --tenant-id %myAzureTenantId% --location %MyAzureLocation% --subscription-id %myAzureSubscriptionId% --cloud AzureCloud --correlation-id 01324567-890a-bcde-f012-34567890abcd"
 
@@ -30,7 +33,6 @@ multipass exec %clusterid% -- bash -c "az connectedk8s connect --name %clusterid
 multipass exec %clusterid% -- bash -c "az connectedk8s enable-features --name %clusterid% --resource-group %clusterid% --custom-locations-oid %myAzureServicePrincipalObjectId% --features cluster-connect custom-locations"
 
 rem setup azure policy, azure defender for cloud, azure monitor for containers
-multipass exec %clusterid% -- bash -c "az monitor log-analytics workspace create -g %clusterid% --workspace-name %clusterid%
 multipass exec %clusterid% -- bash -c "az k8s-extension create --name azuremonitor-containers --cluster-name %clusterid% --resource-group %clusterid% --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID='/subscriptions/%myAzureSubscriptionId%/resourceGroups/%clusterid%/providers/Microsoft.OperationalInsights/workspaces/%clusterid%'"
 multipass exec %clusterid% -- bash -c "az k8s-extension create --name microsoft.policyinsights --cluster-type connectedClusters --cluster-name %clusterid% --resource-group %clusterid% --extension-type Microsoft.PolicyInsights"
 multipass exec %clusterid% -- bash -c "az k8s-extension create --name microsoft.azuredefender.kubernetes --cluster-type connectedClusters --cluster-name %clusterid% --resource-group %clusterid% --extension-type microsoft.azuredefender.kubernetes"
