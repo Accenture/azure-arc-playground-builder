@@ -1,0 +1,4 @@
+resource_groups=$(az group list --query "[].name" -o tsv)
+for resource_group in $resource_groups; do
+    az group delete -y -n $resource_group --no-wait
+done
